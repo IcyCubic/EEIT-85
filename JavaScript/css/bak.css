@@ -1,0 +1,83 @@
+* {margin:0; padding:0; font-size:100%;}
+
+body {
+	background-image: url("../img/dirt_tile.jpg");
+}
+#canvas {
+	width:1024px;				
+	margin:0 auto;		
+}
+header {
+	width:100%;
+}
+nav {width:100%; margin:0 auto;}
+
+#navagation_menu {
+	overflow:auto !important; /* !important is for IE7+, tells it to prioritize this line */
+	overflow /**/:hidden; /* this line is specifically for IE5, tells it to hide the scroll bar from size calculations */ 
+	background-color:#007500;				
+	border-top-right-radius:15px;
+	border-top-left-radius:15px;
+	border-bottom:2px solid #CCCCCC;
+	}
+#navagation_menu li {
+	list-style-type:none;
+	float:left;
+	width:7em;
+	border-right:1px solid #CCCCCC;
+	text-align:center;
+	}
+#navagation_menu li a {
+	width:100%;
+	text-decoration:none;
+	color:#FFFFFF;
+	display:block;
+	line-height:2.5em;
+}
+#navagation_menu li a:link {}
+#navagation_menu li a:hover {
+	text-decoration:underline;
+	background-color:#00FF7F;
+	color:#000000;
+}
+
+#content {
+	width:100%;
+	height:500px;
+	background-color:#00A600;
+}
+.title {
+	background-color:#007500;
+	line-height:2.5em;
+	color:#F0F0F0;
+	padding-left:20px;
+}
+article {
+	float:left;
+	width: 79%;
+}
+aside {
+	float:right;
+	width: 19%;
+}
+aside dl {
+	margin:20px;
+}
+aside dl dd {
+	padding-bottom:5px;
+	border-bottom:1px solid #CCCCCC;
+	margin-bottom:5px;
+}			
+footer {				 
+	background-color:#007500;				
+	border-bottom-right-radius:15px;
+	border-bottom-left-radius:15px;
+	border-top:2px solid #CCCCCC;
+	clear:both;
+}
+footer p {
+	line-height:2.5em;
+	width:100%;
+	color:#FFFFFF;				
+	text-align:center;								
+}

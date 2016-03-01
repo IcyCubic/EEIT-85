@@ -1,0 +1,141 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Henry Lai Homework #4</title>
+
+    <style>
+        #container {
+            margin-left:auto;
+            margin-right:auto;
+            text-align:center;
+            margin-top: 50px;
+            display:block;
+        }
+        .rectangle {
+	        width: 75px;
+	        height: 20px;
+	        background: white;
+            border:1px solid green;
+            display:inline-block;
+            border-radius:25px;
+        }
+        .controls {
+            width:  70px;
+	        height: 70px;
+	        background: white;
+            border:3px solid green;
+            display:inline-block;
+            border-radius:50px;
+            margin: 10px;
+        }
+        img {
+            border-radius:15px;
+            padding: 5px;
+            border:3px double green;
+        }
+    </style>
+
+    <script>
+
+        window.onload = function () {
+            setad();
+            document.getElementById("ads").onmouseover = adin;
+            document.getElementById("ads").onmouseout = adout;
+
+            document.getElementById("next").onclick = nextad;
+            document.getElementById("stop").onclick = stopad;
+            document.getElementById("pre").onclick = pread;
+
+            var buttons = document.querySelectorAll("span.rectangle");
+            for (i = 0; i < buttons.length; i++) {
+                buttons[i].onmouseover = function () { mouseOver(this.id); };
+                buttons[i].onmouseout = function () { mouseOut(this.id); };
+                buttons[i].onclick = function () { Click(this.id); };
+            }
+        }
+
+
+        var pause = 2000;
+        var rotate = window.setInterval("setad()", pause);
+        var pos = 1;
+        var stopped = false;
+
+        var list = new Array();
+        list[1] = "http://www.google.com";
+        list[2] = "http://www.yahoo.com";
+        list[3] = "http://www.bing.com";
+        list[4] = "http://www.microsoft.com";
+        list[5] = "http://www.apple.com";
+        
+        function mouseOver(x) {
+            adin();
+            document.getElementById(x).style = "background-color:red;";
+
+            pos = parseInt(x.substring(1));
+            setad();
+        }
+        function mouseOut(x) {
+            document.getElementById(x).style = "background-color:white;";
+            adout();
+        }
+        function Click(x) { }
+
+        function nextad() { setad(); }
+        function pread() { pos -= 2; setad(); }
+        function stopad() {
+            if (!stopped) {
+                clearInterval(rotate);
+                document.getElementById("stop").value = "Play";
+                stopped = true;
+            }
+            else if (stopped) {
+                rotate = window.setInterval("setad()", pause);
+                document.getElementById("stop").value = "Stop";
+                stopped = false;
+            }
+        }
+        
+
+        function adin() { if (!stopped) clearInterval(rotate); }
+        function adout() { if (!stopped) rotate = window.setInterval("setad()", pause); }
+
+        function setad() {            
+            if (pos == 0) pos = 5;
+            if (pos == 6) pos = 1;
+            document.getElementById("ads").src = "../img/ad" + pos + ".jpg";
+            document.getElementById("imglink").href = list[pos];
+            //document.getElementById("position").innerHTML = pos + " " + list[pos];
+            document.getElementById("b" + pos).style = "background-color:red;";
+            for (i = 1; i < 6; i++)
+                if (i != pos)
+                    document.getElementById("b" + i).style = "background-color:white;";
+            pos += 1;
+
+            
+        }
+        
+
+    </script>
+</head>
+<body>
+    <div id="container">
+        <a href="www.google.com" id="imglink"><img src="../img/ad1.jpg" id ="ads"/></a><br />
+        <a href="http://www.google.com" id="a1"><span id="b1" class="rectangle">1</span></a> 
+        <a href="http://www.yahoo.com" id="a2"><span id="b2" class="rectangle">2</span></a> 
+        <a href="http://www.bing.com" id="a3"><span id="b3" class="rectangle">3</span></a> 
+        <a href="http://www.microsoft.com" id="a4"><span id="b4" class="rectangle">4</span></a> 
+        <a href="http://www.apple.com" id="a5"><span id="b5" class="rectangle">5</span></a> 
+        <!--<div id="position"></div>-->
+        <br />
+    
+        <span id="prbutton"><input type="button" value ="Previous" id="pre" /></span>
+        <span id="sbutton"><input type="button" value="Stop" id="stop" /></span>
+        <span id="nxbutton"><input type="button" value="Next" id="next" /></span><br />
+<!--        <span class="controls">Previous</span>
+        <span class="controls">Stop</span>
+        <span class="controls">Next</span>-->
+    </div>
+
+</body>
+</html>

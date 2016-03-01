@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+    div.inline { float:left; }
+	.flip{
+		width: 75px;
+		height: 111px;
+		margin: auto;
+		position: relative;
+	}
+	.front{
+		display:block;
+		transform: rotateY(0deg);
+		transition:.4s;
+		backface-visibility: hidden;
+	}
+	.back{
+		position: absolute;
+		width: 75px;
+		height: 111px;
+		left: 0;
+		top: 0;
+		transform: rotateY(180deg);
+		transition:.4s;
+		backface-visibility: hidden;
+	}
+    .flipfront {
+		transform: rotateY(-180deg);
+    }
+	.flipback {
+	    transform: rotateY(0deg);
+    }
+	</style>
+    <script>
+
+        var toggle = []; //individual click toggle flag
+            toggle[1] = false;
+            toggle[2] = false;
+
+        window.onload = function () { //individual click functions
+            document.getElementById("frnt1").onclick = function () { flipfront(this.id) };
+            document.getElementById("back1").onclick = function () { flipfront(this.id) };
+
+            document.getElementById("frnt2").onclick = function () { flipfront(this.id) };
+            document.getElementById("back2").onclick = function () { flipfront(this.id) };
+
+        } //end window.onload
+
+        function flipfront(ID) {
+            
+            if (toggle[ID.substring(4)] == true) {
+                document.getElementById("frnt" + ID.substring(4)).setAttribute("class", "front");
+                document.getElementById("back" + ID.substring(4)).setAttribute("class", "back");                
+            }
+            if (toggle[ID.substring(4)] == false) {
+                document.getElementById("frnt" + ID.substring(4)).setAttribute("class", "front flipfront");
+                document.getElementById("back" + ID.substring(4)).setAttribute("class", "back flipback");                
+            }
+            toggle[ID.substring(4)] = toggle[ID.substring(4)] ? false : true;
+        }
+    </script>
+</head>
+<body>
+    
+	<div class="flip inline">
+		<img src="img/memory/cards/back.png"  id="frnt1" class="front" style="width:75px;"/>
+		<img src="img/memory/cards/1Clo.png" id="back1" class="back" style="width:75px;"/>
+	</div>
+
+    <div class="flip inline">
+		<img src="img/memory/cards/back.png" id="frnt2" class="front" style="width:75px;"/>
+		<img src="img/memory/cards/1Dia.png" id="back2" class="back" style="width:75px;"/>
+	</div>
+
+
+
+</body>
+</html>

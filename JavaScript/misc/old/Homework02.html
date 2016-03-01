@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Homework Form</title>
+    <style>
+
+        .field1{
+		    width:550px;
+			margin:15px;
+		}
+		.title{
+			width:100px;
+			float:left;
+			text-align:center;
+			padding:3px;
+		}
+
+		fieldset{
+			width:600px;
+			margin: 0 auto;
+			border-radius:15px;
+			border-color:#82D900;				
+		}
+        p {
+            text-align:left;
+            padding-left:100px;
+            margin:0;
+        }
+    </style>
+    <script>
+
+        function res() {
+            var pIcon = document.getElementById("pwicon");
+            var nIcon = document.getElementById("nameicon");
+            var dIcon = document.getElementById("dateicon");
+            
+
+            pIcon.src = "./img/blank20.png";
+            nIcon.src = "./img/blank20.png";
+            dIcon.src = "./img/blank20.png";
+          
+        }
+
+        function vName() {
+            var n = document.getElementById("name").value;
+            var icon = document.getElementById("nameicon");
+            var len = n.length;
+            var lenFlag = false, zhFlag = false;
+
+            if (len >= 2) {
+                lenFlag = true;
+                for (i = 0; i < len; i++) {
+                    nChar = n.charAt(i);
+                    if (nChar.toString().match(/[\u3400-\u9FBF]/)) {
+                        zhFlag = true;
+                        break;
+                    }
+                }
+            }
+            if (!lenFlag || !zhFlag)
+                icon.src = "./img/bad20.jpg";
+            if (lenFlag && zhFlag)
+                icon.src = "./img/good20.png";
+
+        }
+
+        function vDate() {
+            var d = document.getElementById("date1").value;
+            var icon = document.getElementById("dateicon");
+            var len = d.length;
+            var test = Date.parse(d);
+            var dateParts = d.split("/");
+            var lenFlag = false, zhFlag = false;
+
+            if (len == 10 && dateParts[0].length == 4 && !isNaN(test))
+                icon.src = "./img/good20.png";
+            else
+                icon.src = "./img/bad20.jpg";
+
+        }
+
+        function vPass() { //Verify password
+            var pwd = document.getElementById("pw").value;
+            var icon = document.getElementById("pwicon");
+            var arr = ['!', '@', '#', '$', '%', '^', '&', '*'];
+
+            var len = pwd.length;
+            var flagUpper = false, flagLower = false, flagNum = false, flagSpecial = false;
+
+            if (len < 6)
+                icon.src = "./img/bad20.jpg";
+            else {
+                for (i = 0; i < len; i++) {
+                    pwChar = pwd.charAt(i);
+                    if (pwChar >= 'A' && pwChar <= 'Z')
+                        flagUpper = true;
+                    else if (pwChar >= 'a' && pwChar <= 'z')
+                        flagLower = true;
+                    else if (pwChar >= '0' && pwChar <= '9')
+                        flagNum = true;
+                    else if (arr.indexOf(pwChar) != -1)
+                        flagSpecial = true;
+                    if (flagNum && flagLower && flagUpper && flagSpecial)
+                        break;
+                }
+                if (flagNum && flagLower && flagUpper && flagSpecial)
+                    icon.src = "./img/good20.png";
+                else {
+                    icon.src = "./img/bad20.jpg";
+                 //   alert("Incorrect password format! (Requires at least one of each: An upper case letter, a lower case letter, and a number.");
+                }
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <form>
+		<fieldset>
+			<legend>Form Check</legend>
+			<div class="field1">
+				<label class="title" for="name">姓名:</label>
+				<input id="name" type="text" name="userName" placeholder="請輸入姓名" autofocus="" autocomplete="off"/>
+                <img src="./img/blank20.png" id="nameicon"/>                
+                <p>(不可空白，至少兩個字且必須為中文字)</p>
+			</div>			
+			<div class="field1">	
+				<label class="title" for="pw">密碼:</label>
+				<input id="pw" type="password" name="Password" placeholder="請輸入密碼"/>
+                <img src="./img/blank20.png" id="pwicon" /> 
+                <p>(不可空白，不包含中文，至少六個字且必須包含英文字母，數字，特殊字元 [!@#$%^&*])</p>
+			</div>
+			<div class="field1">
+				<label class="title" for="date1">日期:</label>
+				<input id="date1" type="text" name="theDate" placeholder="yyyy/mm/dd"/>
+                <img src="./img/blank20.png" id="dateicon"/> 
+                <p>(格式: 西元年/月/日 ex. 2016/02/16)</p>
+			</div>
+            <div class="field1">
+                <label class="title"></label>
+			    <input type="Reset" value="Reset" onclick="res();"/>
+			    <input type="button" value="Submit" onclick="vPass(); vName(); vDate();"/>
+		    </div>
+		</fieldset>
+    </form>
+</body>
+</html>

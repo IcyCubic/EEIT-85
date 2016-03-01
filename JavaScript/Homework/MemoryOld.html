@@ -1,0 +1,213 @@
+﻿<!-- 
+    Image path: ../img/memory/cards/ 
+    Written by: Henry Lai
+    Feb. 21st, 2016
+    
+    Took about an entire day, I'm sure some code is not optimal, but I'm happy it works! Made this as a practice project
+    after my one week course in JavaScript.
+    
+    I plan on adding some features to this in the future to use some other features like cookies and 
+    local storage (save game? High score table?) 
+    
+    Hope you enjoy the game!
+    
+    You are free to use or modify the code, as long as due credit is given to me and this message is documented in its entirity.   
+    
+    To-do:
+    -High Score Table
+        -Stored via Cookie
+        -appears in separate window, drawn or different html?
+    -Reset Game button
+    -apply Rotating cards CSS 75x111px
+
+-->
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Memory Game 賴建宏</title>
+	<meta name="author" content="Henry Lai"/>
+	<meta name="date" content="2016/2/21"/>
+	<meta name="description" content="JavaScript Card Memory Game"/>
+	<meta name="keywords" content="EEIT85, JavaScript, JS, Game, Memory"/>
+    <style>
+        body {
+        background-image: url(../img/memory/cards/cardtable.jpg);
+        }
+        .information {
+            border: 2px solid black;
+            border-radius:50px;
+            background-color: white;
+            width: 400px;
+            margin-left:auto;
+            margin-right:auto;
+            text-align:center;
+            display:block;
+        }
+        .canvas {
+            width:auto;
+            margin-left:auto;
+            margin-right:auto;
+            text-align:center;
+            display:block;
+        }
+        .card {
+            margin: 5px;
+        }
+    </style>
+    <script>
+        var contents = [];
+        var matched = []; // array of already matched cards
+        var flipped = 0, numcorrect = 0, attempts = 0; // flip counter, match counter, attempts counter
+        var cols = 8; // # of columns
+        var rows = 4; // # of rows
+        var pairs = (cols * rows) / 2; // # of pairs needed to win
+        var hr = 0, min = 0, sec = 0; //timer variables
+        var timestart = false; //flag for timer
+        var time;
+        var suit = ["Clo", "Dia", "Hrt", "Spa"];
+        var rank = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"];
+        var seed = []; // original 52 card deck
+        var deck = []; // container for the cards and their copies used in the memory game.
+        var back = "../img/memory/cards/back.png" // back cover of cards
+
+        window.onload = function () {
+
+            var table = document.getElementById("table");
+            
+            function CreateCard(pos) { //generates a card
+                var card = document.createElement("img");
+                card.src = back;
+                card.setAttribute("class", "card");
+                card.style.width =  "75px";
+                card.setAttribute("id", pos);
+                contents[pos] = "../img/memory/cards/" + pos.substring(0,4) + ".png"; // truncates the 2nd copy's ID from file path
+                table.appendChild(card);
+            }
+
+            function shuffle(array) { //shuffles an array
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+                return array;
+            }
+
+            var seedcount = 0;              //create seed
+            for (var i = 0; i < suit.length; i++)
+                for (var j = 0; j < rank.length; j++) {
+                    seed[seedcount++] = rank[j] + suit[i];
+                }
+            seed = shuffle(seed); //randomizes seed
+
+            var position = 0;               //create card table
+            var numcards = rows * cols;
+            for (var i = 0; i < numcards; i++) {
+                deck.push(seed[i]);         //loads 2 copies of each card from seed until row*col cards.
+                seed[i] = seed[i] + "2";    //properly ID's the copy
+                deck.push(seed[i]);
+                i++;
+            }
+            deck = shuffle(deck); //randomizes positions in deck
+            for (var r = 1; r <= rows; r++) { //generates cards
+                for (var c = 1; c <= cols; c++) {
+                    CreateCard(deck[position]);
+                    position++;
+                }
+                table.insertAdjacentHTML("BeforeEnd", "<br>");
+            }
+
+            var cards = document.querySelectorAll("img.card"); //array of all cards on the table
+            for (i = 0; i < cards.length; i++) { //assigns mouseover, mouseout events
+                cards[i].onmouseover = function () { mover(this.id); };
+                cards[i].onmouseout = function () { mout(this.id); };
+                if (document.addEventListener) { //assigns onclick events
+                    cards[i].addEventListener("click", function () { flip(this.id) }, false);
+                }
+                else if (document.attachEvent) // old IE 
+                    cards[i].attachEvent("onclick", function () { flip(this.id) });
+            }       
+            document.getElementById("getSets").innerHTML = "Sets Matched: " + numcorrect;
+            document.getElementById("timer").innerHTML = "Elapsed Time: " + hr + " hours, " + min + " minutes, " + sec + " seconds";
+            document.getElementById("tries").innerHTML = "Attempts: " + attempts + "<br>";
+        } // end windows.onload
+
+        var choice = []; // container for first and 2nd picked cards
+
+        function flip(index) {
+            if (timestart == false) { timestart = true; time =  window.setInterval("Timer()", 1000); }
+            if (matched.indexOf(index) == -1) { //choice not part of matched sets 
+                flipped++; //counter for cards flipped
+                if (flipped == 1 || flipped == 2) { //assign first or 2nd flipped card
+                    document.getElementById(index).setAttribute("src", contents[index]);
+                    choice[flipped] = index;
+                }
+                if (flipped == 2) {
+                    if (choice[1] == choice[2]) { //choice not the same card location (clicking the same card twice)
+                        flipped = 1;
+                        return;
+                    }
+                    if (document.getElementById(choice[1]).src == document.getElementById(choice[2]).src) { //if they are the same card, verified by img "src"
+                        attempts++;
+                        document.getElementById("tries").innerHTML = "Attempts: " + attempts + "<br>";
+                        numcorrect++;
+                        matched.push(choice[1]); //adds matched choices to matched array
+                        matched.push(choice[2]);
+                        flipped = 0;
+                        document.getElementById("getSets").innerHTML = "Sets Matched: " + numcorrect;
+                        if (numcorrect == pairs) { win(); } // winning condition
+                    }
+                    else { //incorrect pairing
+                        attempts++;
+                        document.getElementById("tries").innerHTML = "Attempts: " + attempts + "<br>";
+                        setTimeout(function () {
+                            document.getElementById(choice[1]).src = back;
+                            document.getElementById(choice[2]).src = back;
+                            flipped = 0;
+                        }, 500);
+                    }
+                }
+            }
+        }
+     
+        function win() {
+            clearInterval(time);
+            document.getElementById("timer").innerHTML = "You finished in: " + hr + " hours, " + min + " minutes, " + sec + " seconds!";
+            if (confirm("You win! Do you want to play again?"))
+                location.reload();
+        }        
+
+        function mover(cardID) { //mouseover
+            //document.getElementById(cardID).setAttribute("src", "../img/memory/mover.png");
+        }
+        function mout(cardID) { //mouseout
+            if (matched.indexOf(cardID) == -1 && flipped == 0) {
+                document.getElementById(cardID).setAttribute("src", back);
+            }
+        }
+
+        function Timer() { //game timer
+            sec++
+            if (sec == 60) { min++; sec = 0; }
+            if (min == 60) { hr++; min = 0; }
+            document.getElementById("timer").innerHTML = "Elapsed Time: " + hr + " hours, " + min + " minutes, " + sec + " seconds";
+        }
+
+        
+    </script>
+</head>
+<body>
+    <div class="canvas">
+        <div id="table" ></div>
+        <div class="information">
+            <span id="tries"></span><span id="getSets"></span><br />
+            <div id="timer"></div>
+        </div>
+        <br /> 
+        <input type="button" value="Restart Game" id="restart" onclick="location.reload();" />
+    </div>
+</body>
+</html>

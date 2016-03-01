@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>JS Arkanoid Clone</title>
+    <style>
+        * { padding: 0; margin: 0; }
+    	canvas { background: #eee; display: block; margin: 0 auto; }
+        #arkanoidWrap { 
+            border:3px double black; 
+            width:600px; 
+            display: block; 
+            margin-left:auto; 
+            margin-right:auto; 
+            text-align:center; 
+            border-bottom-color:red;
+            border-bottom-style:solid;
+        }
+            
+        .bigBox {
+            display: block; 
+            margin-left:auto; 
+            margin-right:auto; 
+            text-align:center; 
+            margin-top:150px;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+
+            //system variables
+            var animation; //container for animation
+            var GameEnd = false; //game end flag
+            var victory = 0; // victory condition (score required);
+
+            //playing field
+            var canvas = document.getElementById("playingField");
+            var context = canvas.getContext("2d");
+
+            //ball stuff
+            var ballRadius = 10; //ball size
+            var ballX = canvas.width / 2;
+            var ballY = canvas.height - 30;
+
+            var ballSpeed = 4.5; //unified ball speed variable
+            var dx = ballSpeed;
+            var dy = -1 * ballSpeed;
+
+            //Paddle stuff
+            var paddleHeight = 10;
+            var paddleWidth = 70;
+            var U = paddleWidth / 7;
+            var paddleX = (canvas.width - paddleWidth) / 2;
+            var rightKey = false;
+            var leftKey = false;
+
+            //block stuff
+            var blockRow = 13;
+            var blockCol = 7;
+            var blockWidth = 42;
+            var blockHeight = 15;
+            var blockPadding = 0; //space between blocks
+            var blockOffsetTop = 30;   // "padding" of blocks field from top
+            var blockOffsetLeft = 30;  // and left of canvas
+
+            //player stuff
+            var score = 0; //winning condition: score = row*col blocks
+            var playerLives = 3; 
+
+            var blocks = []; //initiating block field
+            for (c = 0; c < blockCol; c++) {
+                blocks[c] = [];
+                for (r = 0; r < blockRow; r++) {
+                    blocks[c][r] = { blockX: 0, blockY: 0, status: blockCol - c };
+                    victory += blockCol - c;
+                }
+            }
+
+            document.addEventListener("keydown", keyDownHandler, false);
+            document.addEventListener("keyup", keyUpHandler, false);
+            document.addEventListener("mousemove", mouseMoveHandler, false);
+
+            function roundU(num) { //rounds num to the nearest U
+                var temp = num % U;
+                if (temp > U / 2)
+                    num += U - temp;
+                else
+                    num -= temp;
+                return num;
+            }
+            function keyDownHandler(event) { // Right key press
+                if (event.keyCode == 39) {
+                    rightKey = true;
+                }
+                else if (event.keyCode == 37) { // Left key press
+                    leftKey = true;
+                }
+            }
+            function keyUpHandler(event) { //key release
+                if (event.keyCode == 39) {
+                    rightKey = false;
+                }
+                else if (event.keyCode == 37) {
+                    leftKey = false;
+                }
+            }
+            function mouseMoveHandler(event) { //mouse movement (if mouse is on canvas)
+                var relativeX = event.clientX - canvas.offsetLeft;
+                if (relativeX > 0 && relativeX < canvas.width) {
+                    paddleX = relativeX - paddleWidth / 2;
+                }
+            }
+            function collisionDetection() {
+                for (c = 0; c < blockCol; c++) { //checks every block for collision
+                    for (r = 0; r < blockRow; r++) {
+                        var b = blocks[c][r];
+                        if (b.status >= 1) { //if block is "alive"
+                            if (ballX > b.blockX &&
+                                ballX < b.blockX + blockWidth &&
+                                ballY > b.blockY &&
+                                ballY < b.blockY + blockHeight) {
+                                dy = -dy; //bounce ball
+                                b.status -= 1; // set block to "dead"
+                                score++; //incriment score
+                                if (score == victory) {
+                                    if (window.confirm("Congratulations! You win! Do you want to play again?"))
+                                        document.location.reload();
+                                    else {
+                                        GameEnd = true;
+                                        cancelAnimationFrame(animation);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            function drawBall() {
+                context.beginPath();
+                context.arc(ballX, ballY, ballRadius, 0, Math.PI * 2);
+                context.fillStyle = "black";
+                context.fill();
+                context.closePath();
+            }
+            function drawPaddle() {
+                context.beginPath();
+                context.rect(paddleX, canvas.height - paddleHeight, paddleWidth, paddleHeight);
+                context.fillStyle = "black";
+                context.fill();
+                context.closePath();
+            }
+            function drawBlocks() {
+                for (c = 0; c < blockCol; c++) {
+                    for (r = 0; r < blockRow; r++) {
+                        if (blocks[c][r].status >= 1) {
+                            var blockX = (r * (blockWidth + blockPadding)) + blockOffsetLeft;
+                            var blockY = (c * (blockHeight + blockPadding)) + blockOffsetTop;
+                            blocks[c][r].blockX = blockX;
+                            blocks[c][r].blockY = blockY;
+                            context.beginPath();
+                            context.rect(blockX, blockY, blockWidth, blockHeight);
+                            switch (blocks[c][r].status){
+                                case 1:
+                                    context.fillStyle = "red";
+                                    break;
+                                case 2:
+                                    context.fillStyle = "orange";
+                                    break;
+                                case 3:
+                                    context.fillStyle = "blue";
+                                    break;
+                                case 4:
+                                    context.fillStyle = "green";
+                                    break;
+                                case 5:
+                                    context.fillStyle = "yellow";
+                                    break;
+                                case 6:
+                                    context.fillStyle = "purple";
+                                    break;
+                                case 7:
+                                    context.fillStyle = "black";
+                                    break;
+                                }
+                            context.fill();
+                            context.closePath();
+
+                            context.beginPath();
+                            context.strokeStyle = "white";
+                            context.lineWidth = 2;
+                            context.rect(blockX, blockY, blockWidth, blockHeight);
+                            context.stroke();
+                            context.closePath();
+                        }
+                    }
+                }
+            }
+            function drawScore() {
+                context.fillStyle = "black";
+                context.fillText("Score: " + score, 8, 20);
+            }
+            function drawPlayerLives() {
+                context.fillStyle = "black";
+                context.fillText("Lives: " + playerLives, canvas.width - 65, 20);
+            }
+
+            function draw() {
+                if (!GameEnd) {
+                    context.clearRect(0, 0, canvas.width, canvas.height); //clear entire canvas between each frame
+                    drawBlocks();
+                    drawBall();
+                    drawPaddle();
+                    drawScore();
+                    drawPlayerLives();
+                    collisionDetection();
+
+                    if (ballX + dx > canvas.width - ballRadius || ballX + dx < ballRadius) { //bounce ball off canvas side edge
+                        dx = -dx;
+                    }
+                    if (ballY + dy < ballRadius) { //bounce ball off canvas top edge
+                        dy = -dy;
+                    }
+                    else if (ballY + dy > canvas.height - ballRadius) { //  if ball hits the bottom of the canvas
+                        if (ballX > paddleX && ballX < paddleX + paddleWidth) { //if ball hits paddle *****
+                            dy = -dy; // bounce ball up                            
+                            switch (roundU(ballX - paddleX) / 10) {
+                                case 0: case 7:
+                                    if (dx > 0) dx = 9; else dx = -9;
+                                    if (dy > 0) dy = 5; else dy = -5;
+                                    break;
+                                case 1: case 6:
+                                    if (dx > 0) dx = 6; else dx = -7;
+                                    if (dy > 0) dy = 6; else dy = -6;
+                                    break;
+                                case 2: case 5:
+                                    if (dx > 0) dx = 6; else dx = -6;
+                                    if (dy > 0) dy = 5; else dy = -5;
+
+                                    break;
+                                case 3: case 4:
+                                    if (dx > 0) dx = 4; else dx = -4;
+                                    if (dy > 0) dy = 4; else dy = -4;
+                                    break;
+                            }                            
+                        }
+                        else {
+                            playerLives--; //decrement player life if ball hits bottom and not the paddle
+                            if (!playerLives) {
+                                drawPlayerLives();
+                                if (window.confirm("You lose!!! Do you want to play again?"))
+                                    document.location.reload();
+                                else { //freeze game animation                                    
+                                    GameEnd = true;
+                                    cancelAnimationFrame(animation);
+                                }
+                            }
+                            else { //reset ball position for new life
+                                ballX = canvas.width / 2;
+                                ballY = canvas.height - 30;
+                                dx = ballSpeed; //resets ball speed
+                                dy = -1 * ballSpeed;
+                                paddleX = (canvas.width - paddleWidth) / 2;
+                            }
+                        }
+                    }
+
+                    if (rightKey && paddleX < canvas.width - paddleWidth) { //if key is pressed and the paddle is not at the edge of canvas
+                        paddleX += 7; //paddle speed right
+                    }
+                    else if (leftKey && paddleX > 0) { //if key is pressed and the paddle is not at the edge of canvas
+                        paddleX -= 7; //paddle speed left
+                    }
+
+                    ballX += dx; //movement of the ball every frame
+                    ballY += dy;
+                    animation = requestAnimationFrame(draw);
+                    
+                }
+            }
+
+            draw();
+        } //end window.onload
+    </script>
+
+</head>
+<body>
+    <div class="bigBox">
+        Use Mouse or Left and Right Arrow Keys to control the paddle!
+        <div id="arkanoidWrap">
+            <canvas id="playingField" width="600" height="400"></canvas>                   
+        </div>
+        <input type="button" value="Restart" onclick="location.reload();" /> <br />
+        Written by Henry Lai 2016.2.26 Version 1.0
+    </div>
+</body>
+</html>

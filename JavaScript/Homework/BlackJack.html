@@ -1,0 +1,63 @@
+﻿<!--
+
+    5 decks, shuffled
+    BlackJack Rules
+        Dealer must hit until 17
+        Ace is 1 or 11
+        Can Hold, Hit, Double Down, Split, Insurance, Surrender
+        If total value of cards > 21, bust
+        If player hand > dealer hand, win
+        if player hand = dealer hand, push    
+    
+    Starting $
+    Wager Amount
+    Dealer's Hand
+    Player's Hand
+    
+-->
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <script>
+        window.onload = function () {
+            function shuffle(array) { //shuffles an array
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+                return array;
+            }
+
+            function randomizeSeed() { // creates a deck and shuffles it
+                var seedcount = 0;              
+                for (var i = 0; i < suit.length; i++)
+                    for (var j = 0; j < rank.length; j++) {
+                        seed[seedcount++] = rank[j] + suit[i];
+                    }
+                seed = shuffle(seed); //randomizes seed
+            }
+            randomizeSeed();
+        }
+    </script>
+</head>
+<body>
+    <div class="canvas">
+        <div id="table" ></div>
+        <div class="information">
+            <span id="tries"></span><span id="getSets"></span><br />
+            <div id="timer"></div>
+        </div>
+        <br /> 
+        <div id="controls" class="information" style="width:250px; line-height:32px;">            
+            Bet: $<input type="text" size="2" id="userRow" value="4"/>
+            Columns: <input type="text" size="2" id="userCol" value="8"/>
+        </div>
+        <input type="button" value="Restart Game" id="restart" onclick="location.reload();" /><br />
+    </div>
+</body>
+</html>

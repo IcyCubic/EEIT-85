@@ -1,0 +1,178 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>賴建宏 JavaScript Homework Index</title>
+		<meta name="author" content="Henry Lai"/>
+		<meta name="date" content="2016/2/16"/>
+		<meta name="description" content="JS Homework Index"/>
+		<meta name="keywords" content="EEIT85, JavaScript, JS, Homework"/>
+		
+		<style>
+			@import url('../css/main.css');
+		    #selection {
+		    font-size:200%;
+            }
+			article {
+		        margin-left:auto;
+                margin-right:auto;
+                text-align:center;
+                margin-top: 175px;
+				display:block;
+			} 
+			article p {
+				margin:10px;
+			}
+            .submissionfield { 
+                width: 100px; 
+                height: 50px; 
+                border: 1px solid #999999; 
+                padding: 5px; 
+                font-size:150%;                
+            }
+           .submissionfield2 { 
+                width: auto; 
+                height: 50px; 
+                border: 1px solid #999999; 
+                padding: 5px; 
+                font-size:150%;                
+            }
+		    #display1 {
+		        margin-left:auto;
+                margin-right:auto;
+                text-align:center;
+                display:block;
+                width:250px;
+		        border:1px solid green;
+                border-radius:15px;
+                padding:25px;
+            }
+		</style>
+		<script>
+		    window.onload = function () {
+		        for (i = 2010; i <= 2020; i++) {
+		            var year = window.document.createElement("option");
+		            year.value = i;
+		            year.innerHTML = i;
+		            document.getElementById('idSelectYear').appendChild(year);
+		        }
+		        for (i = 1; i <= 12; i++) {
+		            var month = window.document.createElement("option");
+		            month.value = i;
+		            //if (i > 0 && i < 10)
+		            //    month.innerHTML = "0" + i;
+		            //else
+		            month.innerHTML = i;
+		            document.getElementById('idSelectMonth').appendChild(month);
+		        }
+		        var d = new Date(2010, 1, 0).getDate();
+		        for (i = 1; i <= d; i++) {
+		            var day = window.document.createElement("option");
+		            //if (i > 0 && i < 10)
+		            //    day.innerHTML = "0" + i;
+		            //else
+		            day.innerHTML = i;
+		            day.value = i;
+		            document.getElementById('idSelectDay').appendChild(day);
+		        }
+
+		        document.getElementById("idSelectYear").onchange = change;
+		        document.getElementById("idSelectMonth").onchange = change;
+		        document.getElementById("idSelectDay").onchange = change;
+		    } //end window.onload
+
+		    var inid = new Date(2010, 1, 0).getDate();
+
+		    function change() {
+		        var y = document.getElementById("idSelectYear").value;
+		        var m = document.getElementById("idSelectMonth").value;
+		        updateDay(y, m);
+		        updateDisplay();
+		    }
+
+		    function updateDisplay() {
+		        var y = document.getElementById("idSelectYear").value;
+		        var m = document.getElementById("idSelectMonth").value;
+		        var d = document.getElementById("idSelectDay").value;
+		        document.getElementById("selection").innerHTML = y + "年 " + m + "月 " + d + "日";
+		    }
+
+		    function updateDay(year, month) {
+		        var oldd = document.getElementById("idSelectDay").length;
+		        var newd = new Date(year, month, 0).getDate();
+
+		        if (newd > oldd) {
+		            var diff = newd - oldd; //# of days to add
+		            for (var i = 1; i <= diff; i++) {
+		                var addDay = window.document.createElement("option");
+		                addDay.value = oldd + i;
+		                addDay.innerHTML = oldd + i;
+		                document.getElementById('idSelectDay').appendChild(addDay);
+		            }
+		        }
+		        else if (newd < oldd) {
+		            var diff = oldd - newd; //# of days to remove
+		            for (var j = 1; j <= diff; j++) {
+		                var node = document.getElementById("idSelectDay").lastChild;
+		                node.parentNode.removeChild(node);
+		            }
+		        }
+		    }
+
+		</script>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">				
+			</script>	
+		<![endif]-->
+	</head>
+	<body>
+		<div id="canvas">
+						
+			<header>
+				<nav>
+					<ul id="navagation_menu">
+						<li><a href="../Index.html">Home</a></li>
+						<li><a href="Homework01.html">九九乘法表</a></li>
+						<li><a href="Homework02.html">表單製作</a></li>
+						<li><a href="Homework03.html">評點製作</a></li>
+						<li><a href="Homework04.html">廣告輪播</a></li>
+						<li><a href="Homework05.html">年日曆</a></li>
+						<li><a href="Memory.html">記憶遊戲</a></li>
+                        <li><a href="Gomoku.html">五子棋</a></li>
+					</ul>
+				</nav>				
+			</header>
+			<div id="content">
+				<article>
+                    <div id="display1">
+                        <select id="idSelectYear" class="submissionfield" ></select>
+                        <select id="idSelectMonth"class="submissionfield2" ></select>
+                        <select id="idSelectDay"class="submissionfield2" ></select>                        
+                    </div>
+                    <div id="selection"></div>
+				</article>
+				<aside>
+					<h4 class="title">Aside</h4>
+						<dl>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+						</dl>
+				</aside>
+			</div>
+			<footer>
+				<p>E-mail something@somewhere.com &nbsp; Tel: (02)1234-5678 &nbsp; Somewhere in Taipei, Taiwan &nbsp; &copy; 2015 All Rights Reserved. &nbsp; Written by Henry Lai.</p>
+			</footer>
+		</div>
+	</body>
+	
+</html>

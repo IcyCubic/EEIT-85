@@ -1,0 +1,191 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>評點製作 - Javascript Homework #3 賴建宏</title>
+
+    <style>
+        .s {
+            -webkit-filter: grayscale(1);  /*沒有任何色彩的黑白影像*/            
+        }
+
+        .n {
+            -webkit-filter: grayscale(0);  /*顏色不變*/
+        }
+        #container {
+            margin:0 auto;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            document.getElementById("star1").onmouseover = mover1;
+            document.getElementById("star1").onmouseout = mout1;
+
+            document.getElementById("star2").onmouseover = mover2;
+            document.getElementById("star2").onmouseout = mout2;
+
+            document.getElementById("star3").onmouseover = mover3;
+            document.getElementById("star3").onmouseout = mout3;
+
+            document.getElementById("star4").onmouseover = mover4;
+            document.getElementById("star4").onmouseout = mout4;
+
+            document.getElementById("star5").onmouseover = mover5;
+            document.getElementById("star5").onmouseout = mout5;
+            
+            if (document.addEventListener) {
+                document.getElementById("span1").addEventListener("click", set1, false);
+                document.getElementById("span2").addEventListener("click", set2, false);
+                document.getElementById("span3").addEventListener("click", set3, false);
+                document.getElementById("span4").addEventListener("click", set4, false);
+                document.getElementById("span5").addEventListener("click", set5, false);
+                setselection();
+            }
+            //else if (document.attachEvent) {
+            //    document.attachEvent("onclick", clickDoc);
+            //    document.getElementById("iddiv1").attachEvent("onclick", clickDiv1);
+            //    document.getElementById("iddiv2").attachEvent("onclick", clickDiv2);
+            //}
+        }
+        var flag1 = false, flag2 = false, flag3 = false, flag4 = false, flag5 = false;
+        var starclicked;
+        var clicked = false;
+
+        function setselection() {
+        }
+
+        function set1() {
+            if (flag1 == false)
+                flag1 = true;
+            else
+                flag1 = false;
+            //alert("flag 1 = " + flag1);
+        }
+        function set2() {
+            if (flag2 == false)
+                flag2 = true;
+            else
+                flag2 = false;
+            //alert("flag 2 = " + flag2);
+        }
+        function set3() {
+            if (flag3 == false)
+                flag3 = true;
+            else
+                flag3 = false;
+            //alert("flag 3 = " + flag3);
+        }
+        function set4() {
+            if (flag4 == false)
+                flag4 = true;
+            else
+                flag4 = false;
+            //alert("flag 4 = " + flag4);
+        }
+        function set5() {
+            if (flag5 == false)
+                flag5 = true;
+            else
+                flag5 = false;
+            //alert("flag 5 = " + flag5);
+        }
+
+        function bottomdef() {
+            document.getElementById("bottomtext").innerHTML = "Please leave a rating!";            
+        }
+
+        function mout1() {
+            if (!flag1) {
+                document.getElementById("star1").className = "s";
+                bottomdef();
+            }
+        }
+        function mover1() {
+            if (!flag1) {
+                document.getElementById("star1").className = "n";
+                document.getElementById("bottomtext").innerHTML = "One star... I think this sucks!";
+            }
+        }
+
+        function mout2() {
+            if (!flag2) {
+                mout1();
+                document.getElementById("star2").className = "s";
+                bottomdef();
+            }
+        }
+        function mover2() {
+            if (!flag2) {
+                mover1();
+                document.getElementById("star2").className = "n";
+                document.getElementById("bottomtext").innerHTML = "Two stars... Eh, it could be better!";
+            }
+        }
+
+        function mout3() {
+            if (!flag3) {
+                mout2();
+                document.getElementById("star3").className = "s";
+                bottomdef();
+            }
+        }
+        function mover3() {
+            if (!flag3) {
+                mover2();
+                document.getElementById("star3").className = "n";
+                document.getElementById("bottomtext").innerHTML = "Three stars, not bad~";
+            }
+        }
+
+        function mout4() {
+            if (!flag4) {
+                mout3();
+                document.getElementById("star4").className = "s";
+                bottomdef();
+            }
+        }
+        function mover4() {
+            if (!flag4) {
+                mover3();
+                document.getElementById("star4").className = "n";
+                document.getElementById("bottomtext").innerHTML = "Four stars! Woo-hoo!";
+            }
+        }
+        function mout5() {
+            if (!flag5) {
+                mout4();
+                document.getElementById("star5").className = "s";
+                bottomdef();
+            }
+        }
+        function mover5() {
+            if (!flag5) {
+                mover4();
+                document.getElementById("star5").className = "n";
+                document.getElementById("bottomtext").innerHTML = "Five stars! Awesome!";
+            }
+        }
+    </script>
+
+</head>
+<body>
+    <div id="container">
+        <span id="span1">            
+            <img src ="../img/star.jpg" class="s" id="star1"/>
+            <span id="span2">                
+                <img src ="../img/star.jpg"/ class="s" id="star2"/>
+                <span id="span3">                    
+                    <img src ="../img/star.jpg"/ class="s" id="star3"/>
+                    <span id ="span4">                        
+                        <img src ="../img/star.jpg"/ class="s" id="star4"/>
+                        <span id="span5">                            
+                            <img src ="../img/star.jpg"/ class="s" id="star5"/>
+                        </span>
+                    </span>
+                </span>
+            </span>
+        </span>
+    </div>
+    <div><span id="bottomtext">Please leave a rating!</span></div>
+</body>
+</html>

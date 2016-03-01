@@ -1,0 +1,210 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>賴建宏 JavaScript Homework Index</title>
+		<meta name="author" content="Henry Lai"/>
+		<meta name="date" content="2016/2/16"/>
+		<meta name="description" content="JS Homework Index"/>
+		<meta name="keywords" content="EEIT85, JavaScript, JS, Homework"/>
+		
+		<style>
+			@import url('css/main.css');
+			article {
+				margin:auto auto;												
+				display:block;				
+			} 
+			article p {
+				margin:10px;
+			}
+            #container {
+                margin-left:auto;
+                margin-right:auto;
+                text-align:center;
+                margin-top: 30px;
+                display:block;
+              }
+            .rectangle {
+	            width: 50px;
+	            height: 10px;
+	            background: white;
+                border:1px solid green;
+                display:inline-block;
+                border-radius:25px;
+            }
+            .controls {
+                width:  70px;
+	            height: 70px;
+	            background: white;
+                border:3px solid green;
+                display:inline-block;
+                border-radius:50px;
+                margin: 10px;
+            }
+            img {
+                border-radius:15px;
+                padding: 5px;
+                border:3px double green;
+            }
+		</style>
+		<script>
+
+		    window.onload = function () {
+		        setad();
+		        document.getElementById("ads").onmouseover = adin;
+		        document.getElementById("ads").onmouseout = adout;
+
+		        document.getElementById("next").onclick = nextad;
+		        document.getElementById("stop").onclick = stopad;
+		        document.getElementById("pre").onclick = pread;
+
+		        var buttons = document.querySelectorAll("span.rectangle");
+		        for (i = 0; i < buttons.length; i++) {
+		            buttons[i].onmouseover = function () { mouseOver(this.id); };
+		            buttons[i].onmouseout = function () { mouseOut(this.id); };
+		            buttons[i].onclick = function () { Click(this.id); };
+		        }
+		    }
+
+
+		    var pause = 2000;
+		    var rotate = window.setInterval("setad()", pause);
+		    var pos = 1;
+		    var stopped = false;
+
+		    var list = new Array();
+		    list[1] = "Homework/Homework01.html";
+		    list[2] = "Homework/Homework02.html";
+		    list[3] = "Homework/Homework03.html";
+		    list[4] = "Homework/Homework04.html";
+		    list[5] = "Homework/Homework05.html";
+		    list[6] = "Homework/Memory.html";
+		    list[7] = "Homework/Gomoku.html";
+
+		    var titles = new Array();
+		    titles[1] = "九九乘法表";
+		    titles[2] = "表單製作";
+		    titles[3] = "評點製作";
+		    titles[4] = "廣告輪播";
+		    titles[5] = "年日曆";
+		    titles[6] = "記憶遊戲";
+		    titles[7] = "五子棋";
+
+		    function mouseOver(x) {
+		        adin();
+		        document.getElementById(x).style = "background-color:red;";
+
+		        pos = parseInt(x.substring(1));
+		        setad();
+		    }
+		    function mouseOut(x) {
+		        //document.getElementById(x).style = "background-color:white;";
+		        adout();
+		    }
+		    function Click(x) { }
+
+		    function nextad() { setad(); }
+		    function pread() { pos -= 2; setad(); }
+		    function stopad() {
+		        if (!stopped) {
+		            clearInterval(rotate);
+		            document.getElementById("stop").value = "Play";
+		            stopped = true;
+		        }
+		        else if (stopped) {
+		            rotate = window.setInterval("setad()", pause);
+		            document.getElementById("stop").value = "Stop";
+		            stopped = false;
+		        }
+		    }
+
+
+		    function adin() { if (!stopped) clearInterval(rotate); }
+		    function adout() { if (!stopped) rotate = window.setInterval("setad()", pause); }
+
+		    function setad() {
+		        if (pos == 0) pos = 7;
+		        if (pos == 8) pos = 1;
+		        document.getElementById("scrolltitle").innerHTML = titles[pos];
+		        document.getElementById("ads").src = "img/index/" + pos + ".png";
+		        document.getElementById("imglink").href = list[pos];
+		        //document.getElementById("position").innerHTML = pos + " " + list[pos];
+		        document.getElementById("b" + pos).style = "background-color:red;";
+		        for (i = 1; i < 8; i++)
+		            if (i != pos)
+		                document.getElementById("b" + i).style = "background-color:white;";
+		        pos += 1;
+		    }
+
+		</script>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">				
+			</script>	
+		<![endif]-->
+	</head>
+	<body>
+		<div id="canvas">
+						
+			<header>
+				<nav>
+					<ul id="navagation_menu">
+						<li><a href="Index.html">Home</a></li>
+						<li><a href="Homework/Homework01.html">九九乘法表</a></li>
+						<li><a href="Homework/Homework02.html">表單製作</a></li>
+						<li><a href="homework/Homework03.html">評點製作</a></li>
+						<li><a href="homework/Homework04.html">廣告輪播</a></li>
+						<li><a href="homework/Homework05.html">年日曆</a></li>
+						<li><a href="homework/Memory.html">記憶遊戲</a></li>
+                        <li><a href="homework/Gomoku.html">五子棋</a></li>
+					</ul>
+				</nav>				
+			</header>
+			<div id="content">
+				<article>
+					<h1 class="title" style="text-align:center;">JavaScript Demonstration Samples</h1>											
+                    <div id="container">
+                        <h4 id="scrolltitle"></h4>
+                        <a href="Homework/Homework01.html" id="imglink"><img src="../img/ad1.jpg" id ="ads"/></a><br />
+                        <a href="Homework/Homework01.html" id="a1"><span id="b1" class="rectangle"></span></a> 
+                        <a href="Homework/Homework02.html" id="a2"><span id="b2" class="rectangle"></span></a> 
+                        <a href="Homework/Homework03.html" id="a3"><span id="b3" class="rectangle"></span></a> 
+                        <a href="Homework/Homework04.html" id="a4"><span id="b4" class="rectangle"></span></a> 
+                        <a href="Homework/Homework05.html" id="a5"><span id="b5" class="rectangle"></span></a> 
+                        <a href="Homework/Memory.html" id="a6"><span id="b6" class="rectangle"></span></a> 
+                        <a href="Homework/Gomoku.html" id="a7"><span id="b7" class="rectangle"></span></a> 
+                        <!--<div id="position"></div>-->
+                        <br />
+    
+                        <span id="prbutton"><input type="button" value ="Previous" id="pre" /></span>
+                        <span id="sbutton"><input type="button" value="Stop" id="stop" /></span>
+                        <span id="nxbutton"><input type="button" value="Next" id="next" /></span><br />
+                <!--        <span class="controls">Previous</span>
+                        <span class="controls">Stop</span>
+                        <span class="controls">Next</span>-->
+                    </div>	
+				</article>
+				<aside>
+					<h4 class="title">Aside</h4>
+						<dl>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+						</dl>
+				</aside>
+			</div>
+			<footer>
+				<p>E-mail something@somewhere.com &nbsp; Tel: (02)1234-5678 &nbsp; Somewhere in Taipei, Taiwan &nbsp; &copy; 2015 All Rights Reserved. &nbsp; Written by Henry Lai.</p>
+			</footer>
+		</div>
+	</body>
+	
+</html>

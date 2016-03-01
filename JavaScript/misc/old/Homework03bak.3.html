@@ -1,0 +1,162 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title></title>
+    <style>
+        .s {
+            -webkit-filter: grayscale(1);  /*Black 'n white*/            
+        }
+        .n {
+            -webkit-filter: grayscale(0);  /*Original Colors*/
+        }
+        #container {
+            margin:0 auto;
+        }
+    </style>
+    <script>
+        var starclicked = 0;
+        var pos = 0;
+
+        window.onload = function () {
+            document.getElementById("star1").onmouseover = mover1;
+            document.getElementById("star1").onmouseout = mout1;
+            document.getElementById("star2").onmouseover = mover2;
+            document.getElementById("star2").onmouseout = mout2;
+            document.getElementById("star3").onmouseover = mover3;
+            document.getElementById("star3").onmouseout = mout3;
+            document.getElementById("star4").onmouseover = mover4;
+            document.getElementById("star4").onmouseout = mout4;
+            document.getElementById("star5").onmouseover = mover5;
+            document.getElementById("star5").onmouseout = mout5;
+
+            if (document.addEventListener) {
+                document.getElementById("span1").addEventListener("click", s1, false);
+                document.getElementById("span2").addEventListener("click", s2, false);
+                document.getElementById("span3").addEventListener("click", s3, false);
+                document.getElementById("span4").addEventListener("click", s4, false);
+                document.getElementById("span5").addEventListener("click", s5, false);                
+            }
+        }
+
+        function bottomdef() {
+            document.getElementById("bottomtext").innerHTML = "Please leave a rating!";
+        }
+        
+        function s1() { if (starclicked == 0) starclicked = 1; else starclicked = 0; update(); }
+        function s2() { if (starclicked == 0) starclicked = 2; else starclicked = 0; update(); }
+        function s3() { if (starclicked == 0) starclicked = 3; else starclicked = 0; update(); }
+        function s4() { if (starclicked == 0) starclicked = 4; else starclicked = 0; update(); }
+        function s5() { if (starclicked == 0) starclicked = 5; else starclicked = 0; update(); }
+
+        //function s1() { if (starclicked != 0) starclicked = 0; else starclicked = 1; update(); }
+        //function s2() { if (starclicked != 0) starclicked = 0; else starclicked = 2; update(); }
+        //function s3() { if (starclicked != 0) starclicked = 0; else starclicked = 3; update(); }
+        //function s4() { if (starclicked != 0) starclicked = 0; else starclicked = 4; update(); }
+        //function s5() { if (starclicked != 0) starclicked = 0; else starclicked = 5; update(); }
+
+        //function s1() { starclicked = 1; update(); }
+        //function s2() { starclicked = 2; update(); }
+        //function s3() { starclicked = 3; update(); }
+        //function s4() { starclicked = 4; update(); }
+        //function s5() { starclicked = 5; update(); }
+
+        function mout1() { pos = 0; update();}
+        function mover1() { pos = 1; update(); }
+        function mout2() { pos = 0; update(); }
+        function mover2() { pos = 2; update(); }
+        function mout3() { pos = 0; update(); }
+        function mover3() { pos = 3; update(); }
+        function mout4() { pos = 0; update(); }
+        function mover4() { pos = 4; update(); }
+        function mout5() { pos = 0; update(); }
+        function mover5() { pos = 5; update(); }
+
+        function update() {
+            switch (pos) {
+                case 0:
+                    if (starclicked == 0) {
+                        document.getElementById("star1").className = "s";
+                        document.getElementById("star2").className = "s";
+                        document.getElementById("star3").className = "s";
+                        document.getElementById("star4").className = "s";
+                        document.getElementById("star5").className = "s";
+                        bottomdef();
+                    }
+                    break;
+                case 1:
+                    if (starclicked == 0) {
+                        document.getElementById("star1").className = "n";
+                        document.getElementById("star2").className = "s";
+                        document.getElementById("star3").className = "s";
+                        document.getElementById("star4").className = "s";
+                        document.getElementById("star5").className = "s";
+                        document.getElementById("bottomtext").innerHTML = "One star... I think this sucks! (Click again to re-choose!)";
+                    }
+                    break;
+                case 2:
+                    if (starclicked == 0) {
+                        document.getElementById("star1").className = "n";
+                        document.getElementById("star2").className = "n";
+                        document.getElementById("star3").className = "s";
+                        document.getElementById("star4").className = "s";
+                        document.getElementById("star5").className = "s";
+                        document.getElementById("bottomtext").innerHTML = "Two stars... Eh, it could be better! (Click again to re-choose!)";
+                    }
+                    break;
+                case 3:
+                    if (starclicked == 0) {
+                        document.getElementById("star1").className = "n";
+                        document.getElementById("star2").className = "n";
+                        document.getElementById("star3").className = "n";
+                        document.getElementById("star4").className = "s";
+                        document.getElementById("star5").className = "s";
+                        document.getElementById("bottomtext").innerHTML = "Three stars, not bad~ (Click again to re-choose!)";
+                    }
+                    break;
+                case 4:
+                    if (starclicked == 0) {
+                        document.getElementById("star1").className = "n";
+                        document.getElementById("star2").className = "n";
+                        document.getElementById("star3").className = "n";
+                        document.getElementById("star4").className = "n";
+                        document.getElementById("star5").className = "s";
+                        document.getElementById("bottomtext").innerHTML = "Four stars! Woo-hoo! (Click again to re-choose!)";
+                    }
+                    break;
+                case 5:
+                    if (starclicked == 0) {
+                        document.getElementById("star1").className = "n";
+                        document.getElementById("star2").className = "n";
+                        document.getElementById("star3").className = "n";
+                        document.getElementById("star4").className = "n";
+                        document.getElementById("star5").className = "n";
+                        document.getElementById("bottomtext").innerHTML = "Five stars! Awesome! (Click again to re-choose!)";
+                    }
+                    break;
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div id="container">
+        <span id="span1">            
+            <img src ="../img/star.jpg" class="s" id="star1"/>
+        </span>
+        <span id="span2">                
+            <img src ="../img/star.jpg"/ class="s" id="star2"/>
+        </span>
+        <span id="span3">                    
+            <img src ="../img/star.jpg"/ class="s" id="star3"/>
+        </span>
+        <span id ="span4">                        
+            <img src ="../img/star.jpg"/ class="s" id="star4"/>
+        </span>
+        <span id="span5">                            
+            <img src ="../img/star.jpg"/ class="s" id="star5"/>
+        </span>        
+    </div>            
+    <div><span id="bottomtext">Please leave a rating!</span></div>
+</body>
+</html>

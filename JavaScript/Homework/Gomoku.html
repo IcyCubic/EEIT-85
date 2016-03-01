@@ -1,0 +1,251 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>五子棋 賴建宏 JavaScript </title>
+		<meta name="author" content="Henry Lai"/>
+		<meta name="date" content="2016/2/16"/>
+		<meta name="description" content="JS Homework Index"/>
+		<meta name="keywords" content="EEIT85, JavaScript, JS, Homework"/>
+		
+		<style>
+            @import url('../css/main.css');
+            
+			article {
+		        margin-left:auto;
+                margin-right:auto;
+                text-align:center;
+                margin-top: 0;
+				display:block;		
+			} 
+			article p {
+				margin:10px;                
+			}
+            canvas {
+                border: 3px double black;
+                border-radius:10px;
+                background-color:#e8bb79;
+            }
+		</style>
+		<script>
+		    window.onload = function () {
+		        var board = []; //creating a 2D array representing the board
+		        var winner = []; //container for coordinates of winning pieces
+		        var currentPlayer = "Black";
+		        var U = 32; //pixel unit of measure between points on the board
+		        var canvas = document.getElementById("FivePieceDrawSpace");
+		        var context = canvas.getContext("2d");
+		        var GameEnd = false;
+
+		        canvas.onclick = clicked;
+
+		        function initboard() { //initiates the board & sets all cells to 0
+		            for (var i = 0; i < 15; i++) {
+		                board[i] = [];
+		                for (var j = 0; j < 15; j++) {
+		                    board[i][j] = "empty";
+		                }
+		            }
+		        }
+		        initboard();
+
+		        function roundU(num) { //rounds num to the nearest U
+		            var temp = num % U;
+		            if (temp > U / 2)
+		                num += U - temp;
+		            else
+		                num -= temp;
+		            return num;
+		        }
+
+		        function clicked() {
+		            var cX = roundU(event.offsetX);
+		            var cY = roundU(event.offsetY);
+		            var gX = cX / U - 1;
+		            var gY = cY / U - 1;
+
+		            if (!GameEnd) {
+		                if (board[gX][gY] == "empty") {
+		                    board[gX][gY] = currentPlayer;
+		                    drawPiece(cX, cY, currentPlayer);
+		                    GameEnd = chkWin(gX, gY, currentPlayer);
+		                    if (GameEnd) return;
+		                    currentPlayer = currentPlayer == "Black" ? "White" : "Black";
+		                    document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn.";
+		                }
+		                else {
+		                    document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn."
+                                + " That space is already occupied! Please choose another spot!";
+		                }
+		            }
+		        }
+
+		        function chkWin(x, y, player) { // should be able to condense this code, work out logic later
+		            var pieces = 0;
+		            for (var i = x; i < board.length; i++) { //check row from piece to far edge
+		                if (board[i][y] == player) { winner[pieces] = [i, y]; pieces++; }
+		                else break;
+		            }
+		            for (var i = x - 1; i >= 0; i--) { //check row from piece to close edge
+		                if (board[i][y] == player) { winner[pieces] = [i, y]; pieces++; }
+		                else break;
+		            }
+		            if (pieces >= 5) { announce(player); return true; }
+
+		            pieces = 0;
+		            for (var i = y; i < board.length; i++) { //check col from piece to far edge
+		                if (board[x][i] == player) { winner[pieces] = [x, i]; pieces++; }
+		                else break;
+		            }
+		            for (var i = y - 1; i >= 0; i--) { //check col from piece to close edge
+		                if (board[x][i] == player) { winner[pieces] = [x, i]; pieces++; }
+		                else break;
+		            }
+		            if (pieces >= 5) { announce(player); return true; }
+
+		            pieces = 0;
+		            var temp = 0;
+		            for (var i = x; i < board.length; i++) { //check / diag from piece to far edge                    
+		                if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp--]; pieces++; }
+		                else break;
+		            }
+		            temp = 1;
+		            for (var i = x - 1; i >= 0; i--) { //check / diag from piece to close edge
+		                if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp++]; pieces++ }
+		                else break;
+		            }
+		            if (pieces >= 5) { announce(player); return true; }
+
+		            pieces = 0;
+		            var temp = 0;
+		            for (var i = x; i < board.length; i++) { //check \ diag from piece to far edge                    
+		                if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp++]; pieces++; }
+		                else break;
+		            }
+		            temp = -1;
+		            for (var i = x - 1; i >= 0; i--) { //check \ diag from piece to close edge
+		                if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp--]; pieces++ }
+		                else break;
+		            }
+		            if (pieces >= 5) { announce(player); return true; }
+		        }
+
+		        function announce(player) {
+		            document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " wins!!!"
+		            for (var i = 0; i < winner.length; i++)
+		                drawWin(parseInt(winner[i][0]), winner[i][1]);
+		        }
+
+		        function drawWin(x, y) {
+		            context.beginPath(); //center dot
+		            context.arc((x + 1) * U, (y + 1) * U, 14, 0, 2 * Math.PI, true);
+		            context.strokeStyle = "red";
+		            context.lineWidth = 3;
+		            context.stroke();
+		            context.closePath();
+		        }
+
+		        function drawDot(x, y) {
+		            context.beginPath(); //center dot
+		            context.arc(x, y, 2, 0, 2 * Math.PI, true);
+		            context.fillStyle = "Black";
+		            context.fill();
+		            context.stroke();
+		            context.closePath();
+		        }
+
+		        function drawGrid() {
+		            for (var i = 1; i <= 15; i++) {
+		                context.beginPath(); //vertical lines
+		                context.moveTo(U * i, 0);
+		                context.lineTo(U * i, U * 16);
+		                context.strokeStyle = "Black";
+		                context.lineWidth = 1;
+		                context.stroke();
+		                context.closePath();
+
+		                context.beginPath(); //horizontal lines
+		                context.moveTo(0, U * i);
+		                context.lineTo(U * 16, U * i);
+		                context.strokeStyle = "Black";
+		                context.lineWidth = 1;
+		                context.stroke();
+		                context.closePath();
+
+		                drawDot(8 * U, 8 * U);
+		                drawDot(4 * U, 4 * U);
+		                drawDot(12 * U, 4 * U);
+		                drawDot(4 * U, 12 * U);
+		                drawDot(12 * U, 12 * U);
+
+		                document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn.";
+		            }
+		        }
+		        drawGrid();
+
+
+		        function drawPiece(x, y, color) {
+		            context.beginPath();
+		            context.arc(x, y, 14, 0, 2 * Math.PI, true);
+		            context.fillStyle = color;
+		            context.fill();
+		            context.stroke();
+		            context.closePath();
+		        }
+		    } //end window.onload
+
+		</script>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">				
+			</script>	
+		<![endif]-->
+	</head>
+	<body>
+		<div id="canvas">
+						
+			<header>
+				<nav>
+					<ul id="navagation_menu">
+						<li><a href="../Index.html">Home</a></li>
+						<li><a href="Homework01.html">九九乘法表</a></li>
+						<li><a href="Homework02.html">表單製作</a></li>
+						<li><a href="Homework03.html">評點製作</a></li>
+						<li><a href="Homework04.html">廣告輪播</a></li>
+						<li><a href="Homework05.html">年日曆</a></li>
+						<li><a href="Memory.html">記憶遊戲</a></li>
+                        <li><a href="Gomoku.html">五子棋</a></li>
+					</ul>
+				</nav>				
+			</header>
+			<div id="content">
+				<article>
+					<div id="FivePieceContainer">
+                        <canvas id="FivePieceDrawSpace" width="512px" height="512px"></canvas>
+                        <div id="FivePiecePlayer"></div>
+                    </div> <!-- end FivePieceContainer -->
+				</article>
+				<aside>
+					<h4 class="title">Aside</h4>
+						<dl>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+						</dl>
+				</aside>
+			</div>
+			<footer>
+				<p>E-mail something@somewhere.com &nbsp; Tel: (02)1234-5678 &nbsp; Somewhere in Taipei, Taiwan &nbsp; &copy; 2015 All Rights Reserved. &nbsp; Written by Henry Lai.</p>
+			</footer>
+		</div>
+	</body>
+	
+</html>

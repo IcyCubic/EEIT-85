@@ -1,0 +1,135 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>賴建宏 JavaScript Homework Index</title>
+		<meta name="author" content="Henry Lai"/>
+		<meta name="date" content="2016/2/16"/>
+		<meta name="description" content="JS Homework Index"/>
+		<meta name="keywords" content="EEIT85, JavaScript, JS, Homework"/>
+		
+		<style>
+            @import url('../css/main.css');
+            
+			article {
+				margin:auto auto;												
+				display:block;
+                margin-top:150px;				
+			} 
+			article p {
+				margin:10px;                
+			}
+            table {
+                color: red;
+			    border:3px solid black;            
+			    width:700px;
+			    border-collapse:collapse;
+			    margin:0 auto;
+                }
+        
+            td {
+                border: 2px solid black;
+                border-top: none;
+                border-bottom:none;
+                padding: 2px;
+            }
+
+		    tbody {
+			    background-color:#C1FFE4;
+			    text-align:center;
+		    }
+		    tbody tr:nth-child(2n) {background-color: #BBFFFF;}
+		    tbody tr:nth-child(2n+1) {background-color: #d0d0d0;}
+		    tbody td:hover {background-color: yellow;}
+	
+		</style>
+		<script>
+		    //Static multiplcation table
+
+		    //document.write("<table><tbody>");
+		    //for (i = 1; i <= 9; i++) {
+		    //    document.write("<tr>");
+		    //    for (j = 1; j <= 9; j++) {
+		    //        document.write("<td>" + i + '*' + j + '=' + (i * j) + "</td>");
+		    //    }
+		    //    document.write("</tr>");
+		    //}
+		    //document.write("</tbody></table> <hr><hr>")
+		    ////Dynamic Table!
+		    //document.write("Dynamic multiplcation table commented out in source code.");
+		    //function multiplicationTable() {
+		    //    x = window.prompt("Multiplication Table Value #1: ", "9");
+		    //    y = window.prompt("Multiplication Table Value #2: ", "9");
+		    //    document.write("<table><tbody>");
+		    //    for (i = 1; i <= x; i++) {
+		    //        document.write("<tr>");
+		    //        for (j = 1; j <= y; j++) {
+		    //            document.write("<td>" + i + '*' + j + '=' + (i * j) + "</td>");
+		    //        }
+		    //        document.write("</tr>");
+		    //    }
+		    //    document.write("</tbody></table>")
+		    //}
+		    //multiplicationTable();
+		</script>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">				
+			</script>	
+		<![endif]-->
+	</head>
+	<body>
+		<div id="canvas">
+						
+			<header>
+				<nav>
+					<ul id="navagation_menu">
+						<li><a href="../Index.html">Home</a></li>
+						<li><a href="Homework01.html">九九乘法表</a></li>
+						<li><a href="Homework02.html">表單製作</a></li>
+						<li><a href="Homework03.html">評點製作</a></li>
+						<li><a href="Homework04.html">廣告輪播</a></li>
+						<li><a href="Homework05.html">年日曆</a></li>
+						<li><a href="Memory.html">記憶遊戲</a></li>
+                        <li><a href="Gomoku.html">五子棋</a></li>
+					</ul>
+				</nav>				
+			</header>
+			<div id="content">
+				<article>
+					<script>
+					    document.write("<table><tbody>");
+					    for (i = 1; i <= 9; i++) {
+					        document.write("<tr>");
+					        for (j = 1; j <= 9; j++) {
+					            document.write("<td>" + j + ' * ' + i + ' = ' + (i * j) + "</td>");
+					        }
+					        document.write("</tr>");
+					    }
+					    document.write("</tbody></table>")
+					</script>
+				</article>
+				<aside>
+					<h4 class="title">Aside</h4>
+						<dl>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+						</dl>
+				</aside>
+			</div>
+			<footer>
+				<p>E-mail something@somewhere.com &nbsp; Tel: (02)1234-5678 &nbsp; Somewhere in Taipei, Taiwan &nbsp; &copy; 2015 All Rights Reserved. &nbsp; Written by Henry Lai.</p>
+			</footer>
+		</div>
+	</body>
+	
+</html>

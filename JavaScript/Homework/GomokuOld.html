@@ -1,0 +1,198 @@
+﻿<!-- 
+Gomoku:
+    Board, 15x15 grid
+    Pieces, black and white
+    Turn based, black player, white player
+    
+    Rules:
+    First player to get 5 pieces in a row wins.
+    Valid on all axis
+        "win" check on every piece placement... need a 2D array representing the board and piece placement
+    
+    To-Do:
+        "Moves list" store and replay the moves
+        More UI information displays
+
+    Written by: Henry Lai 2/23/2016, JavaScript Draw/Logic practice project
+-->
+
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>五子棋 </title>
+    <style>
+        canvas {
+        border: 3px double black;
+        border-radius:10px;
+        background-color:#e8bb79;
+        }
+    </style>
+    <script>
+        window.onload = function () {
+            var board = []; //creating a 2D array representing the board
+            var winner = []; //container for coordinates of winning pieces
+            var currentPlayer = "Black";
+            var U = 32; //pixel unit of measure between points on the board
+            var canvas = document.getElementById("FivePieceDrawSpace");
+            var context = canvas.getContext("2d");
+            var GameEnd = false;
+
+            canvas.onclick = clicked;
+
+            function initboard() { //initiates the board & sets all cells to 0
+                for (var i = 0; i < 15; i++) {
+                    board[i] = [];
+                    for (var j = 0; j < 15; j++) {
+                        board[i][j] = "empty";
+                    }
+                }
+            }
+            initboard();
+
+            function roundU(num) { //rounds num to the nearest U
+                var temp = num % U;
+                if (temp > U / 2)
+                    num += U - temp;
+                else
+                    num -= temp;
+                return num;
+            }
+
+            function clicked() {
+                var cX = roundU(event.offsetX);
+                var cY = roundU(event.offsetY);
+                var gX = cX / U - 1;
+                var gY = cY / U - 1;
+
+                if (!GameEnd) {
+                    if (board[gX][gY] == "empty") {
+                        board[gX][gY] = currentPlayer;
+                        drawPiece(cX, cY, currentPlayer);
+                        GameEnd = chkWin(gX, gY, currentPlayer);
+                        if (GameEnd) return;
+                        currentPlayer = currentPlayer == "Black" ? "White" : "Black";
+                        document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn.";
+                    }
+                    else {
+                        document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn."
+                            + " That space is already occupied! Please choose another spot!";
+                    }                        
+                }
+            }
+
+            function chkWin(x, y, player) { // should be able to condense this code, work out logic later
+                var pieces = 0;
+                for (var i = x; i < board.length; i++) { //check row from piece to far edge
+                    if (board[i][y] == player) { winner[pieces] = [i, y]; pieces++; }
+                    else break; }
+                for (var i = x-1; i >=0; i--) { //check row from piece to close edge
+                    if (board[i][y] == player) { winner[pieces] = [i, y]; pieces++; }
+                    else break; }
+                if (pieces >= 5) { announce(player); return true; }
+
+                pieces = 0;
+                for (var i = y; i < board.length; i++) { //check col from piece to far edge
+                    if (board[x][i] == player) { winner[pieces] = [x, i]; pieces++; }
+                    else break; }
+                for (var i = y - 1; i >= 0; i--) { //check col from piece to close edge
+                    if (board[x][i] == player) { winner[pieces] = [x, i]; pieces++; }
+                    else break; }
+                if (pieces >= 5) { announce(player); return true; }
+
+                pieces = 0;
+                var temp = 0;
+                for (var i = x; i < board.length; i++) { //check / diag from piece to far edge                    
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp--]; pieces++; }
+                    else break; }
+                temp = 1;
+                for (var i = x - 1; i >= 0; i--) { //check / diag from piece to close edge
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp++]; pieces++ }
+                    else break;}
+                if (pieces >= 5) { announce(player); return true; }
+
+                pieces = 0;
+                var temp = 0;
+                for (var i = x; i < board.length; i++) { //check \ diag from piece to far edge                    
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp++]; pieces++; }
+                    else break; }
+                temp = -1;
+                for (var i = x - 1; i >= 0; i--) { //check \ diag from piece to close edge
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp--]; pieces++ }
+                    else break; }
+                if (pieces >= 5) {announce(player); return true; }
+            }
+
+            function announce(player) {
+                document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " wins!!!"
+                for (var i = 0; i < winner.length; i++)
+                    drawWin(parseInt(winner[i][0]), winner[i][1]);
+            }
+            
+            function drawWin(x, y) {
+                context.beginPath(); //center dot
+                context.arc((x + 1) * U, (y + 1) * U, 14, 0, 2 * Math.PI, true);
+                context.strokeStyle = "red";
+                context.lineWidth = 3;
+                context.stroke();
+                context.closePath();
+            }
+
+            function drawDot(x, y) {
+                context.beginPath(); //center dot
+                context.arc(x, y, 2, 0, 2 * Math.PI, true);
+                context.fillStyle = "Black";
+                context.fill();
+                context.stroke();
+                context.closePath();
+            }
+
+            function drawGrid() {
+                for (var i = 1; i <= 15; i++) {
+                    context.beginPath(); //vertical lines
+                    context.moveTo(U * i, 0);
+                    context.lineTo(U * i, U * 16);
+                    context.strokeStyle = "Black";
+                    context.lineWidth = 1;
+                    context.stroke();
+                    context.closePath();
+
+                    context.beginPath(); //horizontal lines
+                    context.moveTo(0, U * i);
+                    context.lineTo(U * 16, U * i);
+                    context.strokeStyle = "Black";
+                    context.lineWidth = 1;
+                    context.stroke();
+                    context.closePath();
+
+                    drawDot(8 * U, 8 * U);
+                    drawDot(4 * U, 4 * U);
+                    drawDot(12 * U, 4 * U);
+                    drawDot(4 * U, 12 * U);
+                    drawDot(12 * U, 12 * U);
+
+                    document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn.";
+                }
+            }
+            drawGrid();
+            
+
+            function drawPiece(x, y, color) {               
+                context.beginPath();
+                context.arc(x, y, 14, 0, 2 * Math.PI, true);
+                context.fillStyle = color;
+                context.fill();
+                context.stroke();
+                context.closePath();
+            }
+        } //end window.onload
+      
+    </script>
+</head>
+<body>
+    <div id="FivePieceContainer">
+        <canvas id="FivePieceDrawSpace" width="512px" height="512px"></canvas>
+        <div id="FivePiecePlayer"></div>
+    </div> <!-- end FivePieceContainer -->
+</body>
+</html>

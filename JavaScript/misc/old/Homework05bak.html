@@ -1,0 +1,92 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>Henry Lai Homework 05</title>
+    <style>
+    </style>
+    <script>
+        window.onload = function () {            
+            for (i = 2010; i <= 2020; i++) {
+                var year = window.document.createElement("option");
+                year.value = i;
+                year.innerHTML = i;
+                document.getElementById('idSelectYear').appendChild(year);
+            }
+            for (i = 1; i <= 12; i++) {
+                var month = window.document.createElement("option");
+                month.value = i;
+                //if (i > 0 && i < 10)
+                //    month.innerHTML = "0" + i;
+                //else
+                    month.innerHTML = i;
+                document.getElementById('idSelectMonth').appendChild(month);
+            }
+            var d = new Date(2010, 1, 0).getDate();
+            for (i = 1; i <= d; i++) {
+                var day = window.document.createElement("option");
+                //if (i > 0 && i < 10)
+                //    day.innerHTML = "0" + i;
+                //else
+                    day.innerHTML = i;                
+                day.value = i;
+                document.getElementById('idSelectDay').appendChild(day);
+            }
+
+            document.getElementById("idSelectYear").onchange = change;
+            document.getElementById("idSelectMonth").onchange = change;
+            document.getElementById("idSelectDay").onchange = change;
+        } //end window.onload
+
+        var inid = new Date(2010, 1, 0).getDate();
+
+        function change() {
+            var y = document.getElementById("idSelectYear").value;
+            var m = document.getElementById("idSelectMonth").value;
+            updateDay(y, m);
+            updateDisplay();
+        }                
+
+        function updateDisplay () {
+            var y = document.getElementById("idSelectYear").value;
+            var m = document.getElementById("idSelectMonth").value;
+            var d = document.getElementById("idSelectDay").value;
+            document.getElementById("selection").innerHTML="You selected -->  Year: " + y + " Month: " + m + " Day: " + d;
+        }
+
+        function updateDay(year, month) {
+            var oldd = document.getElementById("idSelectDay").length;
+            var newd = new Date(year, month, 0).getDate();
+            
+            
+            if (newd > oldd) {
+                var diff = newd - oldd;
+                for (var i = 1; i <= diff; i++) {
+                    var addDay = window.document.createElement("option");
+                    addDay.value = oldd + i;
+                    addDay.innerHTML = oldd + i;
+                    document.getElementById('idSelectDay').appendChild(addDay);
+                }
+            }
+            else if (newd < oldd) {
+                
+                var diff = oldd - newd; //# of days to remove
+                for (var j = 1; j <= diff; j++) {
+                    var node = document.getElementById("idSelectDay").lastChild;
+                    node.parentNode.removeChild(node);
+                }
+            }
+        }
+
+    </script>
+
+</head>
+<body>
+    <div id="content">
+        <select id="idSelectYear"></select>
+        <select id="idSelectMonth"></select>
+        <select id="idSelectDay"></select>
+        <div id="selection"></div>
+    </div>
+</body>
+</html>

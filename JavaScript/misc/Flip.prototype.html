@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Document</title>
+	<style>
+	*{
+		margin: 0;
+		padding: 0;
+		list-style:none;
+	}
+	.flip{
+		width: 250px;
+		height: 350px;
+		margin: auto;
+		border:10px solid #fff;
+		box-shadow:0px 3px 10px #aaa;
+		position: relative;
+	}
+	.flip img{
+		display:block;
+		transform:perspective(400px) rotateY(0deg);
+		transition:.5s;
+		/*opacity:.5;*/
+		backface-visibility: hidden;
+	}
+	.flip:hover img{
+		transform:perspective(400px) rotateY(-180deg);
+	}
+
+	.flip p{
+		position: absolute;
+		width: 230px;
+		height: 330px;
+		left: 0;
+		top: 0;
+		padding: 10px;
+		background-color:#666;
+		color:#fff;
+		transform:perspective(400px) rotateY(180deg);
+		transition:.5s;
+		/*opacity:.5;*/
+		backface-visibility: hidden;
+	}
+	.flip:hover p{
+		transform:perspective(400px) rotateY(0deg);
+	}
+	</style>
+    <script>
+        window.open(¡§http://www.kimo.com.tw¡¨,¡¨win¡¨);  
+    </script>
+</head>
+<body>
+	
+
+	<div class="flip">
+		<img src="https://api.fnkr.net/testimg/250x350/00CED1/FFF/?text=img+placeholder">
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Ipsam nobis sapiente, sint ad. Dolorum animi, earum voluptate incidunt excepturi neque.</p>
+	</div>
+
+
+
+</body>
+</html>

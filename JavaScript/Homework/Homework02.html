@@ -1,0 +1,285 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8">
+		<title>賴建宏 JavaScript Homework assignment #2</title>
+		<meta name="author" content="Henry Lai"/>
+		<meta name="date" content="2016/2/16"/>
+		<meta name="description" content="JS Homework Index"/>
+		<meta name="keywords" content="EEIT85, JavaScript, JS, Homework"/>
+		
+		<style>
+			@import url('../css/main.css');
+			article {
+				margin:auto auto;												
+				display:block;				
+			} 
+			article p {
+				margin:10px;                
+			}
+		    form {
+                margin-top:125px; 
+		    }            
+            .field1{
+		        width:550px;
+			    margin:15px;
+		    }
+		    .tit{
+			    width:100px;
+			    float:left;
+			    text-align:center;
+			    padding:3px;
+		    }
+		    fieldset{
+			    width:600px;
+			    margin: 0 auto;
+			    border-radius:15px;
+			    border-color:#82D900;
+                background-color: white;				
+		    }
+            p {
+                text-align:left;
+                padding-left:100px;
+                margin:0;            
+            }
+		    span {
+		    height:10px;
+            display:inline-block;
+            }
+		</style>
+    <script>
+
+        window.onload = function () {
+            with (document) {
+                getElementById("name").onblur = vName;
+                getElementById("name").onfocus = fName;
+
+                getElementById("pw").onblur = vPass;
+                getElementById("pw").onfocus = fPass;
+
+                getElementById("date1").onblur = vDate;
+                getElementById("date1").onfocus = fDate;
+
+                onsubmit = verify;
+                onreset = res;
+
+                getElementById("name").onmouseover = moName;
+                getElementById("pw").onmouseover = moPass;
+                getElementById("date1").onmouseover = moDate;
+
+                getElementById("name").onmouseout = moutN;
+                getElementById("pw").onmouseout = moutP;
+                getElementById("date1").onmouseout = moutD;
+            }
+        }
+
+        function fName() {
+            document.getElementById("nameerr").innerHTML = "";
+            document.getElementById("nameicon").innerHTML = "";
+        }
+        function fPass() {
+            document.getElementById("pwerr").innerHTML = "";
+            document.getElementById("pwicon").innerHTML = "";
+        }
+        function fDate() {
+            document.getElementById("dateerr").innerHTML = "";
+            document.getElementById("dateicon").innerHTML = "";
+        }
+
+        function moutN() {
+            document.getElementById("name").style.backgroundColor = "white"
+        }
+
+        function moutP() {
+            document.getElementById("pw").style.backgroundColor = "white"
+        }
+
+        function moutD() {
+            document.getElementById("date1").style.backgroundColor = "white"
+        }
+
+        function moName() {
+            document.getElementById("name").style.backgroundColor = "yellow"
+        }
+        function moPass() {
+            document.getElementById("pw").style.backgroundColor = "yellow"
+        }
+        function moDate() {
+            document.getElementById("date1").style.backgroundColor = "yellow"
+        }
+
+        function verify() {
+            var warningmsg = "Invalid input at: ";
+            var namechk = vName(), pwchk = vPass(), datechk = vDate();
+
+            if (namechk && pwchk && datechk)
+                alert("All fields valid");
+            else {
+                if (!namechk)
+                    warningmsg += " Name";
+                if (!pwchk)
+                    warningmsg += " Password";
+                if (!datechk)
+                    warningmsg += " Date";
+                alert(warningmsg);
+            }
+        }
+
+        function res() {
+            var pIcon = document.getElementById("pwicon");
+            var nIcon = document.getElementById("nameicon");
+            var dIcon = document.getElementById("dateicon");
+
+            document.getElementById("dateerr").innerHTML = "";
+            document.getElementById("dateicon").innerHTML = "";
+
+            document.getElementById("nameerr").innerHTML = "";
+            document.getElementById("nameicon").innerHTML = "";
+
+            document.getElementById("pwerr").innerHTML = "";            
+            document.getElementById("pwicon").innerHTML = "";
+        }
+
+        function vName() {
+            var n = document.getElementById("name").value;
+            var icon = document.getElementById("nameicon");
+            var re = /^[\u3400-\u9FBF]{2,}$/;
+
+            if (re.test(n)) {
+                //icon.src = "../img/good20.png";
+                icon.innerHTML = "<img src='../img/good20.png'>";
+                document.getElementById("nameerr").innerHTML = "";
+                return true;
+            }
+            else {
+                //icon.src = "../img/bad20.jpg";
+                icon.innerHTML = "<img src='../img/bad20.jpg'>";
+                document.getElementById("nameerr").innerHTML = "(不可空白，至少兩個字且必須為中文字)";
+                return false;
+            }
+        }
+
+        function vDate() {
+            var d = document.getElementById("date1").value;
+            var icon = document.getElementById("dateicon");
+            var len = d.length;
+            var date = new Date(d);
+            var dmonth = parseInt(date.getMonth()) + 1;
+            var test = Date.parse(d);
+            var dateParts = d.split("/");
+
+            if (len == 10 && dateParts[0] == parseInt(date.getFullYear()) && !isNaN(test) && dateParts[1] == dmonth) {
+                //icon.src = "../img/good20.png";
+                icon.innerHTML = "<img src='../img/good20.png'>";
+                document.getElementById("dateerr").innerHTML = "";
+                return true;
+            }
+            else {
+                //icon.src = "../img/bad20.jpg";
+                icon.innerHTML = "<img src='../img/bad20.jpg'>";
+                document.getElementById("dateerr").innerHTML = "(格式: 西元年/月/日 ex. 2016/02/16)";
+                return false;
+            }
+        }
+
+        function vPass() {
+            var pwd = document.getElementById("pw").value;
+            var icon = document.getElementById("pwicon");
+            var re = /^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[!@#$%^&*]).{6,}$/;
+
+            if (re.test(pwd)) {
+                //icon.src = "../img/good20.png";
+                icon.innerHTML = "<img src='../img/good20.png'>";
+                document.getElementById("pwerr").innerHTML = "";
+                return true;
+            }
+            else {
+                //icon.src = "../img/bad20.jpg";
+                icon.innerHTML = "<img src='../img/bad20.jpg'>";
+                document.getElementById("pwerr").innerHTML = "(不可空白，不包含中文，至少六個字且必須包含英文字母，數字，特殊字元[!@#$%^&*])";                
+                return false;
+            }
+        }
+
+    </script>
+		<!--[if lt IE 9]>
+			<script src="http://html5shim.googlecode.com/svn/trunk/html5.js">				
+			</script>	
+		<![endif]-->
+	</head>
+	<body>
+		<div id="canvas">
+						
+			<header>
+				<nav>
+					<ul id="navagation_menu">
+						<li><a href="../Index.html">Home</a></li>
+						<li><a href="Homework01.html">九九乘法表</a></li>
+						<li><a href="Homework02.html">表單製作</a></li>
+						<li><a href="Homework03.html">評點製作</a></li>
+						<li><a href="Homework04.html">廣告輪播</a></li>
+						<li><a href="Homework05.html">年日曆</a></li>
+						<li><a href="Memory.html">記憶遊戲</a></li>
+                        <li><a href="Gomoku.html">五子棋</a></li>
+					</ul>
+				</nav>				
+			</header>
+			<div id="content">
+				<article>
+					  <form>
+		                <fieldset>
+			                <legend>Form Check</legend>
+			                <div class="field1">
+				                <label class="tit" for="name">姓名:</label>
+				                <input id="name" type="text" name="userName" placeholder="請輸入姓名" autocomplete="off"/>
+                                <!--<img src="../img/blank20.png" id="nameicon"/>                -->
+                                <span id="nameicon"></span>
+                                <p><span id="nameerr" style = "color:red;"></span></p>
+			                </div>			
+			                <div class="field1">	
+				                <label class="tit" for="pw">密碼:</label>
+				                <input id="pw" type="password" name="Password" placeholder="請輸入密碼 ex. a1@xyz"/>
+                                <!--<img src="../img/blank20.png" id="pwicon" />--> 
+                                <span id="pwicon"></span>
+                                <p><span id="pwerr" style = "color:red;"></span></p>
+			                </div>
+			                <div class="field1">
+				                <label class="tit" for="date1">日期:</label>
+				                <input id="date1" type="text" name="theDate" placeholder="yyyy/mm/dd""/>
+                                <!--<img src="../img/blank20.png" id="dateicon"/>--> 
+                                <span id="dateicon"></span>
+                                <p><span id="dateerr" style = "color:red;"></span></p>
+			                </div>
+                            <div class="field1">
+                                <label class="tit"></label>
+			                    <input type="Reset" value="Reset" id="res" />
+			                    <input type="Submit" value="Submit" id="sub" />
+		                    </div>
+		                </fieldset>
+                    </form>
+				</article>
+				<aside>
+					<h4 class="title">Aside</h4>
+						<dl>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+							<dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+                            <dt>Event Name, mm/dd/yyyy</dt>
+							<dd>Event description</dd>
+						</dl>
+				</aside>
+			</div>
+			<footer>
+				<div>E-mail something@somewhere.com &nbsp; Tel: (02)1234-5678 &nbsp; Somewhere in Taipei, Taiwan &nbsp; &copy; 2015 All Rights Reserved. &nbsp; Written by Henry Lai.</div>
+			</footer>
+		</div>
+	</body>
+	
+</html>
