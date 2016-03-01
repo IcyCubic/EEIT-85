@@ -1,0 +1,1004 @@
+﻿<!DOCTYPE html>
+<!-- <html xmlns="http://www.w3.org/1999/xhtml"> -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<!--<link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>-->
+<!--<link href='https://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>-->
+<link href="css/style.css" rel="stylesheet" type="text/css">
+<!--<link href="css/screen.css" rel="stylesheet" type="text/css">
+<script src="js/modernizr.custom.28468.js"></script>-->
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+
+<title>HENRY LAI</title>
+
+
+
+
+    <script>
+        // Memory Game
+        var toggle = []; //individual click toggle flag
+        var contents = [];
+        var matched = []; // array of already matched cards
+        var flipped = 0, numcorrect = 0, attempts = 0; // flip counter, match counter, attempts counter
+        var cols = 8; // # of columns
+        var rows = 3; // # of rows
+        var pairs = (cols * rows) / 2; // # of pairs needed to win
+        var hr = 0, min = 0, sec = 0; //timer variables
+        var timestart = false; //flag for timer
+        var time;
+        var suit = ["Clo", "Dia", "Hrt", "Spa"];
+        var rank = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K"];
+        var seed = []; // original 52 card deck
+        var deck = []; // container for the cards and their copies used in the memory game.
+        var back = "images/memory/cards/back.png" // back cover of cards
+        var flipping = false;
+
+
+        window.onload = function () {
+            //5-in-a-row onload
+            var board = []; //creating a 2D array representing the board
+            var winner = []; //container for coordinates of winning pieces
+            var currentPlayer = "Black";
+            var U = 32; //pixel unit of measure between points on the board
+            var canvas = document.getElementById("FivePieceDrawSpace");
+            var context = canvas.getContext("2d");
+            var GameEnd = false;
+
+            canvas.onclick = clicked;
+
+            function initboard() { //initiates the board & sets all cells to 0
+                for (var i = 0; i < 15; i++) {
+                    board[i] = [];
+                    for (var j = 0; j < 15; j++) {
+                        board[i][j] = "empty";
+                    }
+                }
+            }
+            initboard();
+
+            function roundU(num) { //rounds num to the nearest U
+                var temp = num % U;
+                if (temp > U / 2)
+                    num += U - temp;
+                else
+                    num -= temp;
+                return num;
+            }
+
+            function clicked() {
+                var cX = roundU(event.offsetX);
+                var cY = roundU(event.offsetY);
+                var gX = cX / U - 1;
+                var gY = cY / U - 1;
+
+                if (!GameEnd) {
+                    if (board[gX][gY] == "empty") {
+                        board[gX][gY] = currentPlayer;
+                        drawPiece(cX, cY, currentPlayer);
+                        GameEnd = chkWin(gX, gY, currentPlayer);
+                        if (GameEnd) return;
+                        currentPlayer = currentPlayer == "Black" ? "White" : "Black";
+                        document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn.";
+                    }
+                    else {
+                        document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn."
+                            + " That space is already occupied! Please choose another spot!";
+                    }
+                }
+            }
+
+            function chkWin(x, y, player) { // should be able to condense this code, work out logic later
+                var pieces = 0;
+                for (var i = x; i < board.length; i++) { //check row from piece to far edge
+                    if (board[i][y] == player) { winner[pieces] = [i, y]; pieces++; }
+                    else break;
+                }
+                for (var i = x - 1; i >= 0; i--) { //check row from piece to close edge
+                    if (board[i][y] == player) { winner[pieces] = [i, y]; pieces++; }
+                    else break;
+                }
+                if (pieces >= 5) { announce(player); return true; }
+
+                pieces = 0;
+                for (var i = y; i < board.length; i++) { //check col from piece to far edge
+                    if (board[x][i] == player) { winner[pieces] = [x, i]; pieces++; }
+                    else break;
+                }
+                for (var i = y - 1; i >= 0; i--) { //check col from piece to close edge
+                    if (board[x][i] == player) { winner[pieces] = [x, i]; pieces++; }
+                    else break;
+                }
+                if (pieces >= 5) { announce(player); return true; }
+
+                pieces = 0;
+                var temp = 0;
+                for (var i = x; i < board.length; i++) { //check / diag from piece to far edge                    
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp--]; pieces++; }
+                    else break;
+                }
+                temp = 1;
+                for (var i = x - 1; i >= 0; i--) { //check / diag from piece to close edge
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp++]; pieces++ }
+                    else break;
+                }
+                if (pieces >= 5) { announce(player); return true; }
+
+                pieces = 0;
+                var temp = 0;
+                for (var i = x; i < board.length; i++) { //check \ diag from piece to far edge                    
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp++]; pieces++; }
+                    else break;
+                }
+                temp = -1;
+                for (var i = x - 1; i >= 0; i--) { //check \ diag from piece to close edge
+                    if (board[i][y + temp] == player) { winner[pieces] = [i, y + temp--]; pieces++ }
+                    else break;
+                }
+                if (pieces >= 5) { announce(player); return true; }
+            }
+
+            function announce(player) {
+                document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " wins!!!"
+                for (var i = 0; i < winner.length; i++)
+                    drawWin(parseInt(winner[i][0]), winner[i][1]);
+            }
+
+            function drawWin(x, y) {
+                context.beginPath(); //center dot
+                context.arc((x + 1) * U, (y + 1) * U, 14, 0, 2 * Math.PI, true);
+                context.strokeStyle = "red";
+                context.lineWidth = 3;
+                context.stroke();
+                context.closePath();
+            }
+
+            function drawDot(x, y) {
+                context.beginPath(); //center dot
+                context.arc(x, y, 2, 0, 2 * Math.PI, true);
+                context.fillStyle = "Black";
+                context.fill();
+                context.stroke();
+                context.closePath();
+            }
+
+            function drawGrid() {
+                for (var i = 1; i <= 15; i++) {
+                    context.beginPath(); //vertical lines
+                    context.moveTo(U * i, 0);
+                    context.lineTo(U * i, U * 16);
+                    context.strokeStyle = "Black";
+                    context.lineWidth = 1;
+                    context.stroke();
+                    context.closePath();
+
+                    context.beginPath(); //horizontal lines
+                    context.moveTo(0, U * i);
+                    context.lineTo(U * 16, U * i);
+                    context.strokeStyle = "Black";
+                    context.lineWidth = 1;
+                    context.stroke();
+                    context.closePath();
+
+                    drawDot(8 * U, 8 * U);
+                    drawDot(4 * U, 4 * U);
+                    drawDot(12 * U, 4 * U);
+                    drawDot(4 * U, 12 * U);
+                    drawDot(12 * U, 12 * U);
+
+                    document.getElementById("FivePiecePlayer").innerHTML = currentPlayer + " player's turn.";
+                }
+            }
+            drawGrid();
+
+
+            function drawPiece(x, y, color) {
+                context.beginPath();
+                context.arc(x, y, 14, 0, 2 * Math.PI, true);
+                context.fillStyle = color;
+                context.fill();
+                context.stroke();
+                context.closePath();
+            }
+            //Memory Game onload
+            var table = document.getElementById("table");
+
+            function CreateCard(pos) { //generates a card
+                var divWrap = document.createElement("div"); // wrapper div, for flipping animation
+                divWrap.setAttribute("class", "flip inline");
+                table.appendChild(divWrap);
+
+                var cardf = document.createElement("img");
+                cardf.src = back;
+                cardf.setAttribute("class", "card front");
+                cardf.style.width = "75px";
+                cardf.setAttribute("id", pos);
+                cardf.setAttribute("dragable", "false");
+                contents[pos] = "images/memory/cards/" + pos.substring(0, 4) + ".png"; // truncates the 2nd copy's pos from file path
+                divWrap.appendChild(cardf);
+
+                var cardb = document.createElement("img");
+                cardb.src = "images/memory/cards/" + pos.substring(0, 4) + ".png";
+                cardb.setAttribute("class", "card back");
+                cardb.style.width = "75px";
+                cardb.setAttribute("id", pos + "b"); //tags the bottom of the card
+                cardb.setAttribute("dragable", "false");
+                contents[pos] = "images/memory/cards/" + pos.substring(0, 4) + ".png"; // truncates the 2nd copy's pos from file path
+                divWrap.appendChild(cardb);
+            }
+
+            function shuffle(array) { //shuffles an array
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+                return array;
+            }
+
+            function randomizeSeed() {
+                var seedcount = 0;              //create seed
+                for (var i = 0; i < suit.length; i++)
+                    for (var j = 0; j < rank.length; j++) {
+                        seed[seedcount++] = rank[j] + suit[i];
+                    }
+                seed = shuffle(seed); //randomizes seed
+            }
+            randomizeSeed();
+
+            var position = 0;               //create card table
+            var numcards = rows * cols;
+            for (var i = 0; i < numcards; i++) {
+                deck.push(seed[i]);         //loads 2 copies of each card from seed until row*col cards.
+                toggle[seed[i]] = false; //dynamically creates array of toggle flags = false;
+                seed[i] = seed[i] + "2";    //properly ID's the copy
+                deck.push(seed[i]);
+                toggle[seed[i]] = false; //dynamically creates array of toggle flags = false;
+                i++;
+            }
+            deck = shuffle(deck); //randomizes positions in deck
+            for (var r = 1; r <= rows; r++) { //generates cards
+                for (var c = 1; c <= cols; c++) {
+                    CreateCard(deck[position]);
+                    position++;
+                }
+                table.insertAdjacentHTML("BeforeEnd", "<br>");
+            }
+
+            var cards = document.querySelectorAll("img.card"); //array of all cards on the table
+            var b = 0, a2 = 0;
+            for (i = 0; i < cards.length; i++) { //assigns mouseover, mouseout events
+                cards[i].onmouseover = function () { mover(this.id); };
+                cards[i].onmouseout = function () { mout(this.id); };                
+                if (document.addEventListener) { //assigns onclick events
+                    if (cards[i].id.substring(4) != "b" && cards[i].id.substring(4) != "2b")
+                        cards[i].addEventListener("click", function () { flip(this.id) }, false); //*****
+                }
+                else if (document.attachEvent) // old IE 
+                    if (cards[i].id.substring(4) != "b" && cards[i].id.substring(4) != "2b")
+                        cards[i].attachEvent("onclick", function () { flip(this.id) });
+            }
+            document.getElementById("getSets").innerHTML = "Sets Matched: " + numcorrect;
+            document.getElementById("timer").innerHTML = "Elapsed Time: " + hr + " hours, " + min + " minutes, " + sec + " seconds";
+            document.getElementById("tries").innerHTML = "Attempts: " + attempts + "    <br>";
+
+            function initialflip() {
+                for (var i = 0; i < cards.length; i++) {
+                    if ((i + 1) % 2 != 0)
+                        cards[i].setAttribute("class", "card front flipfront");
+                    else
+                        cards[i].setAttribute("class", "card back flipback");
+                }
+            }
+            function postflip() {
+                for (var i = 0; i < cards.length; i++) {
+                    if ((i + 1) % 2 != 0)
+                        cards[i].setAttribute("class", "card front");
+                    else
+                        cards[i].setAttribute("class", "card back");
+                }
+            }
+
+            initialflip();
+            myVar = setTimeout(postflip, 2000);
+
+            //HW5 onload
+            for (i = 2010; i <= 2020; i++) {
+                var year = window.document.createElement("option");
+                year.value = i;
+                year.innerHTML = i;
+                document.getElementById('idSelectYear').appendChild(year);
+            }
+            for (i = 1; i <= 12; i++) {
+                var month = window.document.createElement("option");
+                month.value = i;
+                //if (i > 0 && i < 10)
+                //    month.innerHTML = "0" + i;
+                //else
+                month.innerHTML = i;
+                document.getElementById('idSelectMonth').appendChild(month);
+            }
+            var d = new Date(2010, 1, 0).getDate();
+            for (i = 1; i <= d; i++) {
+                var day = window.document.createElement("option");
+                //if (i > 0 && i < 10)
+                //    day.innerHTML = "0" + i;
+                //else
+                day.innerHTML = i;
+                day.value = i;
+                document.getElementById('idSelectDay').appendChild(day);
+            }
+
+            document.getElementById("idSelectYear").onchange = change;
+            document.getElementById("idSelectMonth").onchange = change;
+            document.getElementById("idSelectDay").onchange = change;
+
+            //HW4 onload
+            setad();
+            document.getElementById("ads").onmouseover = adin;
+            document.getElementById("ads").onmouseout = adout;
+
+            document.getElementById("next").onclick = nextad;
+            document.getElementById("stop").onclick = stopad;
+            document.getElementById("pre").onclick = pread;
+
+            var buttons = document.querySelectorAll("span.rectangle");
+            for (i = 0; i < buttons.length; i++) {
+                buttons[i].onmouseover = function () { mouseOver(this.id); };
+                buttons[i].onmouseout = function () { mouseOut(this.id); };
+                buttons[i].onclick = function () { Click(this.id); };
+            }
+            //HW3 onload
+            var stars = document.querySelectorAll("img.star"); //tag.class tag#id
+
+            for (var i = 0; i < stars.length; i++) {
+                stars[i].onmouseover = function () { mover(this.id); };
+                stars[i].onmouseout = mout;
+                if (document.addEventListener)
+                    stars[i].addEventListener("click", function () { s(this.id) }, false);
+                else if (document.attachEvent)
+                    stars[i].attachEvent("onclick", function () { s(this.id) });
+            }
+            document.getElementById("Reset1").onclick = resbutton;
+
+            //HW2 onload
+            with (document) {
+                getElementById("name").onblur = vName;
+                getElementById("name").onfocus = fName;
+
+                getElementById("pw").onblur = vPass;
+                getElementById("pw").onfocus = fPass;
+
+                getElementById("date1").onblur = vDate;
+                getElementById("date1").onfocus = fDate;
+
+                onsubmit = verify;
+                onreset = res;
+
+                getElementById("name").onmouseover = moName;
+                getElementById("pw").onmouseover = moPass;
+                getElementById("date1").onmouseover = moDate;
+
+                getElementById("name").onmouseout = moutN;
+                getElementById("pw").onmouseout = moutP;
+                getElementById("date1").onmouseout = moutD;
+            }
+        } // end windows.onload
+
+        var choice = []; // container for first and 2nd picked cards
+
+        function flip(index) {
+            if (timestart == false) { timestart = true; time = window.setInterval("Timer()", 1000); }
+            if (flipping) return;
+            flipping = true;
+            if (matched.indexOf(index) == -1) { //choice not part of matched sets 
+                flipped++; //counter for cards flipped
+                if (flipped == 1 || flipped == 2) { //assign first or 2nd flipped card
+                    //document.getElementById(index).setAttribute("src", contents[index]);  //***
+                    flipcard(index);
+                    choice[flipped] = index;
+                }
+                if (flipped == 2) {
+                    if (choice[1] + "b" == choice[2] || choice[1] == choice[2] + "b") { //choice not the same card location (clicking the same card twice)
+                        flipped = 1;
+                        return;
+                    }
+                    if ((choice[1] + "2" == choice[2]) || (choice[1] == choice[2] + "2")) { //if they are the same card, verified by element id
+                        attempts++;
+                        document.getElementById("tries").innerHTML = "Attempts: " + attempts + "<br>";
+                        numcorrect++;
+                        matched.push(choice[1]); //adds matched choices to matched array
+                        matched.push(choice[2]);
+                        flipped = 0;
+                        document.getElementById("getSets").innerHTML = "Sets Matched: " + numcorrect;
+                        if (numcorrect == pairs) { win(); } // winning condition
+                    }
+                    else { //incorrect pairing
+                        attempts++;
+                        document.getElementById("tries").innerHTML = "Attempts: " + attempts + "<br>";
+                        setTimeout(function () {
+                            flipcard(choice[1]); //****
+                            flipcard(choice[2]);
+                            flipped = 0;                            
+                        }, 350);
+                    }
+                }                
+                flipping=false;
+            }
+        }
+
+        function flipcard(ID) { //flips the card, key'd to whether or not the card has been flipped according to the flags stored in toggle[]
+            if (toggle[ID] == true) {
+                document.getElementById(ID).setAttribute("class", "front");
+                document.getElementById(ID + "b").setAttribute("class", "back");
+            }
+            if (toggle[ID] == false) {
+                document.getElementById(ID).setAttribute("class", "front flipfront");
+                document.getElementById(ID + "b").setAttribute("class", "back flipback");
+            }
+            toggle[ID] = toggle[ID] ? false : true;
+        }
+
+        function win() {
+            clearInterval(time);
+            document.getElementById("timer").innerHTML = "You finished in: " + hr + " hours, " + min + " minutes, " + sec + " seconds!";
+            if (confirm("You win! Do you want to play again?"))
+                location.reload();
+        }
+
+        function mover(cardID) { //mouseover
+        }
+        function mout(cardID) { //mouseout
+        }
+
+        function Timer() { //game timer
+            sec++
+            if (sec == 60) { min++; sec = 0; }
+            if (min == 60) { hr++; min = 0; }
+            document.getElementById("timer").innerHTML = "Elapsed Time: " + hr + " hours, " + min + " minutes, " + sec + " seconds";
+        }
+
+           
+        var inid = new Date(2010, 1, 0).getDate();
+
+        function change() {
+            var y = document.getElementById("idSelectYear").value;
+            var m = document.getElementById("idSelectMonth").value;
+            updateDay(y, m);
+            updateDisplay();
+        }
+
+        function updateDisplay() {
+            var y = document.getElementById("idSelectYear").value;
+            var m = document.getElementById("idSelectMonth").value;
+            var d = document.getElementById("idSelectDay").value;
+            document.getElementById("selection").innerHTML = y + "年 " + m + "月 " + d + "日";
+        }
+
+        function updateDay(year, month) {
+            var oldd = document.getElementById("idSelectDay").length;
+            var newd = new Date(year, month, 0).getDate();
+
+            if (newd > oldd) {
+                var diff = newd - oldd; //# of days to add
+                for (var i = 1; i <= diff; i++) {
+                    var addDay = window.document.createElement("option");
+                    addDay.value = oldd + i;
+                    addDay.innerHTML = oldd + i;
+                    document.getElementById('idSelectDay').appendChild(addDay);
+                }
+            }
+            else if (newd < oldd) {
+                var diff = oldd - newd; //# of days to remove
+                for (var j = 1; j <= diff; j++) {
+                    var node = document.getElementById("idSelectDay").lastChild;
+                    node.parentNode.removeChild(node);
+                }
+            }
+        }
+
+        // Homework04
+        //window.onload = function () {
+           
+        //}
+
+
+        var pause = 2000;
+        var rotate = window.setInterval("setad()", pause);
+        var position = 1;
+        var stopped = false;
+
+        var list = new Array();
+        list[1] = "http://www.google.com";
+        list[2] = "http://www.yahoo.com";
+        list[3] = "http://www.bing.com";
+        list[4] = "http://www.microsoft.com";
+        list[5] = "http://www.apple.com";
+
+        function mouseOver(x) {
+            adin();
+            document.getElementById(x).style = "background-color:red;";
+
+            position = parseInt(x.substring(1));
+            setad();
+        }
+        function mouseOut(x) {
+            //document.getElementById(x).style = "background-color:white;";
+            adout();
+        }
+        function Click(x) { }
+
+        function nextad() { setad(); }
+        function pread() { position -= 2; setad(); }
+        function stopad() {
+            if (!stopped) {
+                clearInterval(rotate);
+                document.getElementById("stop").value = "Play";
+                stopped = true;
+            }
+            else if (stopped) {
+                rotate = window.setInterval("setad()", pause);
+                document.getElementById("stop").value = "Stop";
+                stopped = false;
+            }
+        }
+
+
+        function adin() { if (!stopped) clearInterval(rotate); }
+        function adout() { if (!stopped) rotate = window.setInterval("setad()", pause); }
+
+        function setad() {
+            if (position == 0) position = 5;
+            if (position == 6) position = 1;
+            document.getElementById("ads").src = "images/ad/ad" + position + ".jpg";
+            document.getElementById("imglink").href = list[position];
+            //document.getElementById("position").innerHTML = pos + " " + list[pos];
+            document.getElementById("b" + position).style = "background-color:   #5B5B5B;";
+            for (var i = 1; i < 6; i++)
+                if (i != position)
+                    document.getElementById("b" + i).style = "background-color:white";
+                    //document.getElementById("b" + i).style = "background-color:#BEBEBE;";
+            position += 1;
+        }
+        // Homework03
+        var starclicked = 0;
+        var pos = 0;
+        var counter = [0, 0, 0, 0, 0, 0]; //clicked counters;
+
+        function s(starID) {
+            starclicked = 0;
+            update();
+            starclicked = parseInt(starID.charAt(4));
+            counter[starclicked]++;
+            update();
+        }
+
+        function resbutton() {
+            starclicked = 0; pos = 0; update();
+            for (var i = 1; i <= 5; i++) {
+                document.getElementById("count" + i).innerHTML = 0;
+                counter[i] = 0;
+            }
+        }
+
+        function mout() { pos = 0; update(); }
+        function mover(starID) { pos = parseInt(starID.charAt(4)); update(); }
+
+        function update() {
+            if (starclicked == 0) {
+                for (var i = (1 + pos) ; i <= 5; i++)
+                    document.getElementById("star" + i).className = "s star";
+                for (var j = 1; j <= pos; j++)
+                    document.getElementById("star" + j).className = "n star";
+                document.getElementById("bottomtext").innerHTML = pos + " star rating.";
+            }
+            if (pos > 0)
+                document.getElementById("count" + pos).innerHTML = counter[pos];
+        }
+
+        // Homework02
+        function fName() {
+            document.getElementById("nameerr").innerHTML = "";
+            document.getElementById("nameicon").innerHTML = "";
+        }
+        function fPass() {
+            document.getElementById("pwerr").innerHTML = "";
+            document.getElementById("pwicon").innerHTML = "";
+        }
+        function fDate() {
+            document.getElementById("dateerr").innerHTML = "";
+            document.getElementById("dateicon").innerHTML = "";
+        }
+
+        function moutN() {
+            document.getElementById("name").style.backgroundColor = "white"
+        }
+
+        function moutP() {
+            document.getElementById("pw").style.backgroundColor = "white"
+        }
+
+        function moutD() {
+            document.getElementById("date1").style.backgroundColor = "white"
+        }
+
+        function moName() {
+            document.getElementById("name").style.backgroundColor = "#FFFFDF";
+        }
+        function moPass() {
+            document.getElementById("pw").style.backgroundColor = "#FFFFDF";
+        }
+        function moDate() {
+            document.getElementById("date1").style.backgroundColor = "#FFFFDF";
+        }
+
+        function verify() {
+            var warningmsg = "Invalid input at: ";
+            var namechk = vName(), pwchk = vPass(), datechk = vDate();
+
+            if (namechk && pwchk && datechk)
+                alert("All fields valid");
+            else {
+                if (!namechk)
+                    warningmsg += " Name";
+                if (!pwchk)
+                    warningmsg += " Password";
+                if (!datechk)
+                    warningmsg += " Date";
+                alert(warningmsg);
+            }
+        }
+
+        function res() {
+            var pIcon = document.getElementById("pwicon");
+            var nIcon = document.getElementById("nameicon");
+            var dIcon = document.getElementById("dateicon");
+
+            document.getElementById("dateerr").innerHTML = "";
+            document.getElementById("dateicon").innerHTML = "";
+
+            document.getElementById("nameerr").innerHTML = "";
+            document.getElementById("nameicon").innerHTML = "";
+
+            document.getElementById("pwerr").innerHTML = "";
+            document.getElementById("pwicon").innerHTML = "";
+        }
+
+        function vName() {
+            var n = document.getElementById("name").value;
+            var icon = document.getElementById("nameicon");
+            var re = /^[\u3400-\u9FBF]{2,}$/;
+
+            if (re.test(n)) {
+                icon.innerHTML = "<img src='images/good20.png'>";
+                document.getElementById("nameerr").innerHTML = "";
+                return true;
+            }
+            else {
+                icon.innerHTML = "<img src='images/bad20.jpg'>";
+                document.getElementById("nameerr").innerHTML = "(不可空白，至少兩個字且必須為中文字)";
+                return false;
+            }
+        }
+
+        function vDate() {
+            var d = document.getElementById("date1").value;
+            var icon = document.getElementById("dateicon");
+            var len = d.length;
+            var date = new Date(d);
+            var dmonth = parseInt(date.getMonth()) + 1;
+            var test = Date.parse(d);
+            var dateParts = d.split("/");
+
+            if (len == 10 && dateParts[0] == parseInt(date.getFullYear()) && !isNaN(test) && dateParts[1] == dmonth) {
+                icon.innerHTML = "<img src='images/good20.png'>";
+                document.getElementById("dateerr").innerHTML = "";
+                return true;
+            }
+            else {
+                icon.innerHTML = "<img src='images/bad20.jpg'>";
+                document.getElementById("dateerr").innerHTML = "(格式: 西元年/月/日 ex. 2016/02/16)";
+                return false;
+            }
+        }
+
+        function vPass() {
+            var pwd = document.getElementById("pw").value;
+            var icon = document.getElementById("pwicon");
+            var re = /^(?=.*[0-9])(?=.*[A-Za-z])(?=.*[!@#$%^&*]).{6,}$/;
+
+            if (re.test(pwd)) {
+                icon.innerHTML = "<img src='images/good20.png'>";
+                document.getElementById("pwerr").innerHTML = "";
+                return true;
+            }
+            else {
+                icon.innerHTML = "<img src='images/bad20.jpg'>";
+                document.getElementById("pwerr").innerHTML = "(不可空白，不包含中文，至少六個字且必須包含英文字母，數字，特殊字元[!@#$%^&*])";
+                return false;
+            }
+        }
+
+        // Homework01
+        // Code in HTML
+    </script>
+</head>
+<body>
+
+    <!-- 第一頁 HOME -->
+   <div class="header" id="home">
+        <div class="menubar">
+            <ul>
+             <!--    <li><a href="#home" class="scroll">HOME</a></li> -->
+                <li><a href="#rating" class="scroll">RATING</a></li>
+                <li><a href="#scrollad" class="scroll">SCROLLING AD</a></li>
+                <li><a href="#nine" class="scroll">9x9 TABLE</a></li>
+                <li><a href="#calendar" class="scroll">CALENDAR</a></li>
+                <li><a href="#memory" class="scroll">MEMORY GAME</a></li>
+                <li><a href="#formcheck" class="scroll">FORM CHECK</a></li>
+                <li><a href="#gomoku" class="scroll">GOMOKU</a></li>
+                <div class="clear"></div>
+            </ul>
+            <div class="logo">
+                <a href="#rating" class="scroll"><span> </span>  HENRY LAI  </a>
+            </div>
+            <div class="down">
+                <a href="#rating" class="scroll"><span> <img src ="images/down.png"> </span>   </a>
+            </div>
+            <div class="clear"></div>
+        </div>
+    </div>
+
+      <!-- 第一頁 -->
+    <!-- 第二頁 rating-->
+
+    <div class="rating_div" id="rating">
+        <div class="wrap">
+            <div class="ratingall_div" id="ratingall">
+                  <!-- Homework03 Stars -->
+                    <div id="StarsWrap">
+
+                  <div class="ra"><p>RATING</p></div>  
+                   
+                        <div id="container">
+
+
+                            <div><img src =" images/p1.jpg" /></div>
+                             <div><span id="bottomtext">Please leave a rating!</span></div>
+                            <span id="span1">            
+                                <img src ="images/star.jpg" width="30px" height="30px" class="s star" id="star1"/>
+                            </span>
+                            <span id="span2">                
+                                <img src ="images/star.jpg"/ width="30px" height="30px" class="s star" id="star2"/>
+                            </span>
+                            <span id="span3">                    
+                                <img src ="images/star.jpg"/ width="30px" height="30px" class="s star" id="star3"/>
+                            </span>
+                            <span id ="span4">                        
+                                <img src ="images/star.jpg"/ width="30px" height="30px" class="s star" id="star4"/>
+                            </span>
+                            <span id="span5">                            
+                                <img src ="images/star.jpg"/ width="30px" height="30px" class="s star" id="star5"/>
+                            </span>        
+                        </div>   
+                        <div id="counterbox">
+                            1 Star:<span id="count1">0</span>,
+                            2 Stars:<span id="count2">0</span>,
+                            3 Stars:<span id="count3">0</span>,
+                            4 Stars:<span id="count4">0</span>,
+                            5 Stars: <span id="count5">0</span>
+                        </div>
+
+                        <form>
+                            <input type="Reset" value="Reset" style="width:125px;" id="Reset1"/>
+                        </form>
+
+                    </div>
+                <div class="clear"> </div>
+            </div>
+        </div>
+    <!-- 第二頁 rating-->
+
+<!--  第三頁  scroll ad  -->
+    <div class="scrollad_div" id="scrollad">
+        <div class="wrap">
+        <h1>SCROLLING AD</h1>
+
+            <div class="scrolladall_div" id="scrolladall">
+                     <!-- Homework04 Ads-->
+                     
+
+                    <div id="AdsWrap">
+                        <div id="Div1">
+                            <a href="www.google.com" id="imglink"><img class="HW04img" src="images/ad/ad1.jpg" id ="ads"/></a><br />
+                            <a href="http://www.google.com" id="a1"><span id="b1" class="rectangle"></span></a> 
+                            <a href="http://www.yahoo.com" id="a2"><span id="b2" class="rectangle"></span></a> 
+                            <a href="http://www.bing.com" id="a3"><span id="b3" class="rectangle"></span></a> 
+                            <a href="http://www.microsoft.com" id="a4"><span id="b4" class="rectangle"></span></a> 
+                            <a href="http://www.apple.com" id="a5"><span id="b5" class="rectangle"></span></a> 
+                            <br />
+                    
+                            <span id="prbutton" class="btn" ><input type="button" value ="Previous" id="pre" /></span>
+                            <span id="sbutton" class="btn"><input type="button" value="Stop" id="stop" /></span>
+                            <span id="nxbutton" class="btn"><input type="button" value="Next" id="next" /></span><br />
+                        </div>
+                    </div>
+                     <div class="bor"></div>   
+
+                <div class="clear"> </div>
+            </div>
+        </div>
+<!--  第三頁  scroll ad  -->
+
+<!-- 9x9 -->
+   <div class="nine_div" id="nine">
+        <div class="wrap">
+            <div class="nineall_div" id="nineall">
+             <div class="ra"><p>9x9 TABLE</p></div>
+                       <!-- Homework01 9x9 -->
+                    <div id="NineNineWrap">
+
+                        <script>
+                            document.write("<table><tbody>");
+                            for (i = 1; i <= 9; i++) {
+                                document.write("<tr>");
+                                for (j = 1; j <= 9; j++) {
+                                    document.write("<td>" + j + ' * ' + i + ' = ' + (i * j) + "</td>");
+                                }
+                                document.write("</tr>");
+                            }
+                            document.write("</tbody></table>")
+                        </script>
+                    </div>
+                <div class="clear"> </div>
+            </div>
+        </div>
+
+<!-- 9x9 -->
+
+<!-- CALENDAR -->
+   <div class="calendar_div" id="calendar">
+        <div class="wrap">
+            <div class="calendarall_div" id="calendarall">
+            <h1>CALENDAR</h1>
+                   <!-- Homework05 Calendar -->
+                    <div id="CalendarWrap">
+                        <div id="display1">
+                            <select id="idSelectYear" class="submissionfield" ></select>
+                            <select id="idSelectMonth"class="submissionfield2" ></select>
+                            <select id="idSelectDay"class="submissionfield2" ></select>                        
+                        </div>
+                        <div id="selection"></div>
+                    </div>
+                <div class="clear"> </div>
+            </div>
+        </div>
+
+
+<!-- CALENDAR -->
+
+<!-- MEMORY GAME -->
+
+   <div class="memory_div" id="memory">
+        <div class="wrap">
+            <div class="memoryall_div" id="memoryall">
+            <h1>MEMORY GAME</h1>
+
+           <!-- Memory Game -->
+    <div id="MemoryWrap">
+        <div class="innercanvas">
+            <div id="table" ></div>
+
+            <div class="information">
+                <span id="tries"></span><span id="getSets"></span><br />
+                <div id="timer"></div>
+            </div>
+
+            <br /> 
+            <input type="button" value="Restart Game" id="restart" onclick="location.reload();" /><br />
+        </div>
+    </div>
+            </div>
+        </div>
+
+
+<!-- MEMORY GAME -->
+
+
+<!-- FORM CHECK-->
+  <div class="formcheck_div" id="formcheck">
+        <div class="wrap">
+            <div class="formcheckall_div" id="formcheckall">
+             <h1>Form Check</h1>
+                 
+<!--Homework02 Form-->
+    <div id="FormWrap">
+        <form class="HW02form">
+            <fieldset>
+              <!--   <legend>Form Check</legend> -->
+                <div class="field1">
+                    <label class="tit" for="name">姓名</label>
+                    <input id="name" type="text" name="userName" placeholder="請輸入姓名" autocomplete="off"/>
+                    <span id="nameicon"></span>
+                    <p class="HW02p"><span id="nameerr" style = "color:red;"></span></p>
+                </div>          
+                <div class="field1">    
+                    <label class="tit" for="pw">密碼</label>
+                    <input id="pw" type="password" name="Password" placeholder="請輸入密碼 ex. a1@xyz"/>
+                    <span id="pwicon"></span>
+                    <p class="HW02p"><span id="pwerr" style = "color:red;"></span></p>
+                </div>
+                <div class="field1">
+                    <label class="tit" for="date1">日期</label>
+                    <input id="date1" type="text" name="theDate" placeholder="yyyy/mm/dd"/>
+                    <span id="dateicon"></span>
+                    <p class="HW02p"><span id="dateerr" style = "color:red;"></span></p>
+                </div>
+                <div class="field1">
+                    <label class="tit"></label>
+                    <input type="Reset" value="Reset" id="res" />
+                    <input type="Submit" value="Submit" id="sub" />
+                </div>
+            </fieldset>
+        </form>
+    </div>
+  
+                 
+                <div class="clear"> </div>
+            </div>
+        </div>
+
+<!-- FORM CHECK-->
+
+<!-- GOMOKU -->
+  <div class="gomoku_div" id="gomoku">
+        <div class="wrap">
+            <div class="gomokuall_div" id="gomokuall">
+              <div class="ra"><p>GOMOKU</p></div>
+                 
+                <!-- 5-in-a-row game -->
+                <div id="FivePieceContainer">
+                    <canvas id="FivePieceDrawSpace" width="512px" height="512px"></canvas>
+                    <div id="FivePiecePlayer"></div>
+                </div> <!-- end FivePieceContainer -->
+                 
+                <div class="clear"> </div>
+            </div>
+        </div>
+<!-- GOMOKU -->
+
+
+  <!-- footer -->
+                <div class="footer">
+                    <div class="footerall">
+                        <a href="#">COPYRIGHT © 2016 HENRY LAI Version 1.01</a>
+                        <script type="text/javascript">
+                        $(document).ready(function() {
+                            $().UItoTop({
+                                easingType: 'easeOutQuart'
+                            });
+                        });
+                        </script>
+                        <script type="text/javascript" src="js/move-top.js"></script>
+                        <script type="text/javascript" src="js/easing.js"></script>
+                        <a href="#" id="toTop" style="display: block;"><span id="toTopHover" style="opacity: 1;"></span></a>
+                        <div class="clear"> </div>
+                    </div>
+                </div>
+             
+
+
+
+       <!---footer-->
+    <script>
+    jQuery(document).ready(function($) {
+        $(".scroll").click(function(event) {
+            event.preventDefault();
+            $('html,body').animate({
+                scrollTop: $(this.hash).offset().top
+            }, 1200);
+        });
+    });
+    </script>
+</body>
+</html>
